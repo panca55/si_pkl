@@ -1,9 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-Future<void> showTambahPerusahaanPopup(
+Future<void> showTambahInfoPopup(
     {
     required BuildContext context,
     required Function(
@@ -11,9 +10,13 @@ Future<void> showTambahPerusahaanPopup(
         onSubmit}) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController alamatController = TextEditingController();
+  final TextEditingController isiController = TextEditingController();
   DateTime? tanggalMulai;
   DateTime? tanggalBerakhir;
+  String dateMulai =
+      DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(tanggalMulai!);
+  String dateAkhir =
+      DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(tanggalBerakhir!);
   Future<void> pickDate(BuildContext context, {bool isMulai = true}) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -53,7 +56,7 @@ Future<void> showTambahPerusahaanPopup(
                       TextFormField(
                         controller: nameController,
                         decoration: const InputDecoration(
-                          labelText: "NAMA LENGKAP",
+                          labelText: "NAMA",
                           border: OutlineInputBorder(),
                         ),
                         validator: (value) {
@@ -65,9 +68,9 @@ Future<void> showTambahPerusahaanPopup(
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
-                        controller: alamatController,
+                        controller: isiController,
                         decoration: const InputDecoration(
-                          labelText: "ALAMAT LENGKAP",
+                          labelText: "ISI",
                           border: OutlineInputBorder(),
                         ),
                         validator: (value) {
@@ -75,6 +78,34 @@ Future<void> showTambahPerusahaanPopup(
                             return 'Username tidak boleh kosong';
                           }
                           return null;
+                        },
+                      ),
+                      TextFormField(
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          labelText: tanggalMulai != null
+                              ? tanggalMulai!.toLocal().toString().split(' ')[0]
+                              : "Pilih Tanggal",
+                          border: const OutlineInputBorder(),
+                        ),
+                        onTap: () async {
+                          await pickDate(context);
+                          setState(() {});
+                        },
+                      ),
+                      TextFormField(
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          labelText: tanggalBerakhir != null
+                              ? tanggalBerakhir!.toLocal().toString().split(' ')[0]
+                              : "Pilih Tanggal",
+                          border: const OutlineInputBorder(),
+                        ),
+                        onTap: () async {
+                          await pickDate(context, isMulai: false);
+                          setState(() {});
                         },
                       ),
                       const SizedBox(height: 10),
@@ -93,7 +124,9 @@ Future<void> showTambahPerusahaanPopup(
                               if (formKey.currentState!.validate()) {
                                 onSubmit({
                                   "nama": nameController.text,
-                                  "slug": nameController.text,
+                                  "isi": isiController.text,
+                                  "tanggal_mulai": dateMulai,
+                                  "tanggal_berakhir": dateAkhir,
                                 });
                                 Navigator.of(context).pop();
                               }

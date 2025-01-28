@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/admin/widgets/show_tambah_info.dart';
 import 'package:si_pkl/provider/admin/informations_provider.dart';
 import 'package:si_pkl/provider/admin/mayors_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
 
-class InformationTablePage extends StatelessWidget {
+class InformationTablePage extends StatefulWidget {
   const InformationTablePage({super.key});
 
+  @override
+  State<InformationTablePage> createState() => _InformationTablePageState();
+}
+
+class _InformationTablePageState extends State<InformationTablePage> {
   @override
   Widget build(BuildContext context) {
     final informationsProvider =
@@ -48,7 +54,27 @@ class InformationTablePage extends StatelessWidget {
                       width: 10,
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () async{
+                        await showTambahInfoPopup(
+                          context: context,
+                          onSubmit: (data) async {
+                            await informationsProvider.addInfo(
+                              data: data,
+                            ).then((value){
+                              // Refresh data setelah popup selesai
+                              informationsProvider.getInformations();
+                              // Perbarui UI
+                              setState(() {});
+                            });
+                          },
+                        );
+
+                        // Refresh data setelah popup selesai
+                        await informationsProvider.getInformations();
+
+                        // Perbarui UI
+                        setState(() {});
+                      },
                       child: Icon(
                         Icons.add_comment_outlined,
                         color: Colors.indigo.shade700,
@@ -204,45 +230,6 @@ class InformationTablePage extends StatelessWidget {
                                                 ),
                                                 child: const Icon(
                                                   Icons.edit_document,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                // final bimbinganId = bursaKerjaData
-                                                //     .id; // Ambil ID siswa dari objek siswa
-                                                // debugPrint('ID yang dipilih: $bimbinganId');
-
-                                                // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                // Navigator.push(
-                                                //   context,
-                                                //   MaterialPageRoute<void>(
-                                                //     builder: (BuildContext context) =>
-                                                //         BimbinganDetail(
-                                                //       bimbinganId: bimbinganId,
-                                                //     ),
-                                                //   ),
-                                                // );
-                                              },
-                                              child: Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 5),
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.red.shade900,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: const Icon(
-                                                  Icons
-                                                      .power_settings_new_sharp,
                                                   color: Colors.white,
                                                 ),
                                               ),

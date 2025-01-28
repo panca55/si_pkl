@@ -23,6 +23,7 @@ class BaseApi{
   var postSubmitInstrukturPath = Uri.parse("$api/corporate/dashboard");
   var addMayorPath = Uri.parse("$api/mayor");
   var addUserPath = Uri.parse("$api/users");
+  var addInfoPath = Uri.parse("$api/info");
   var addDepartmentPath = Uri.parse("$api/department");
   var addTeacherPath = Uri.parse("$api/teacher");
   var addInstrukturPath = Uri.parse("$api/instruktur");

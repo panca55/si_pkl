@@ -312,45 +312,6 @@ class StudentsTablePage extends StatelessWidget {
                                                 padding:
                                                     const EdgeInsets.all(8),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.red.shade900,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: const Icon(
-                                                  Icons
-                                                      .power_settings_new_sharp,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                // final bimbinganId = bursaKerjaData
-                                                //     .id; // Ambil ID siswa dari objek siswa
-                                                // debugPrint('ID yang dipilih: $bimbinganId');
-
-                                                // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                // Navigator.push(
-                                                //   context,
-                                                //   MaterialPageRoute<void>(
-                                                //     builder: (BuildContext context) =>
-                                                //         BimbinganDetail(
-                                                //       bimbinganId: bimbinganId,
-                                                //     ),
-                                                //   ),
-                                                // );
-                                              },
-                                              child: Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 5),
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
                                                   color: GlobalColorTheme
                                                       .errorColor,
                                                   borderRadius:
