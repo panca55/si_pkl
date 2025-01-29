@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_info.dart';
 import 'package:si_pkl/provider/admin/informations_provider.dart';
-import 'package:si_pkl/provider/admin/mayors_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
 
 class InformationTablePage extends StatefulWidget {
@@ -106,179 +105,182 @@ class _InformationTablePageState extends State<InformationTablePage> {
                         ),
                       );
                     } else {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
-                              offset: const Offset(1, 1),
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
-                              offset: const Offset(-1, -1),
-                            ),
-                          ],
-                        ),
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          scrollDirection: Axis.horizontal,
+                      return Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                offset: const Offset(1, 1),
+                              ),
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                offset: const Offset(-1, -1),
+                              ),
+                            ],
+                          ),
                           child: SingleChildScrollView(
-                            child: DataTable(
-                              clipBehavior: Clip.hardEdge,
-                              dataRowMinHeight: 45,
-                              horizontalMargin: 30,
-                              columns: <DataColumn>[
-                                DataColumn(
-                                  label: Text(
-                                    "No".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                            child: SingleChildScrollView(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                clipBehavior: Clip.hardEdge,
+                                dataRowMinHeight: 45,
+                                horizontalMargin: 30,
+                                columns: <DataColumn>[
+                                  DataColumn(
+                                    label: Text(
+                                      "No".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Judul".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Judul".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Isi".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Isi".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Tanggal Mulai".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Tanggal Mulai".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Tanggal Berakhir".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Tanggal Berakhir".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "aksi".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "aksi".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                              ],
-                              rows: List<DataRow>.generate(
-                                informasi.length,
-                                (index) {
-                                  final informasiData = informasi[index];
-                                  final nomor = index + 1;
-                                  final DateTime dateMulai = DateTime.parse(
-                                      informasiData.tanggalMulai!);
-                                  String tanggalMulai =
-                                      DateFormat('EEEE, dd MMMM yyyy', 'id_ID')
-                                          .format(dateMulai);
-                                  final DateTime dateAkhir = DateTime.parse(
-                                      informasiData.tanggalBerakhir!);
-                                  String tanggalBerakhir =
-                                      DateFormat('EEEE, dd MMMM yyyy', 'id_ID')
-                                          .format(dateAkhir);
-                                  return DataRow(
-                                    cells: <DataCell>[
-                                      DataCell(Text(nomor.toString())),
-                                      DataCell(Text(informasiData.nama ?? '-')),
-                                      DataCell(Text(removeHtmlTags(
-                                          informasiData.isi ?? '-'))),
-                                      DataCell(Text(tanggalMulai)),
-                                      DataCell(Text(tanggalBerakhir)),
-                                      DataCell(
-                                        Row(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () async {
-                                                // final bimbinganId = bursaKerjaData
-                                                //     .id; // Ambil ID siswa dari objek siswa
-                                                // debugPrint('ID yang dipilih: $bimbinganId');
-
-                                                // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                // Navigator.push(
-                                                //   context,
-                                                //   MaterialPageRoute<void>(
-                                                //     builder: (BuildContext context) =>
-                                                //         BimbinganDetail(
-                                                //       bimbinganId: bimbinganId,
-                                                //     ),
-                                                //   ),
-                                                // );
-                                              },
-                                              child: Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 5),
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.indigo.shade700,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.edit_document,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                // final bimbinganId = bursaKerjaData
-                                                //     .id; // Ambil ID siswa dari objek siswa
-                                                // debugPrint('ID yang dipilih: $bimbinganId');
-
-                                                // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                // Navigator.push(
-                                                //   context,
-                                                //   MaterialPageRoute<void>(
-                                                //     builder: (BuildContext context) =>
-                                                //         BimbinganDetail(
-                                                //       bimbinganId: bimbinganId,
-                                                //     ),
-                                                //   ),
-                                                // );
-                                              },
-                                              child: Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 5),
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: GlobalColorTheme
-                                                      .errorColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.delete,
-                                                  color: Colors.white,
+                                ],
+                                rows: List<DataRow>.generate(
+                                  informasi.length,
+                                  (index) {
+                                    final informasiData = informasi[index];
+                                    final nomor = index + 1;
+                                    final DateTime dateMulai = DateTime.parse(
+                                        informasiData.tanggalMulai!);
+                                    String tanggalMulai =
+                                        DateFormat('EEEE, dd MMMM yyyy', 'id_ID')
+                                            .format(dateMulai);
+                                    final DateTime dateAkhir = DateTime.parse(
+                                        informasiData.tanggalBerakhir!);
+                                    String tanggalBerakhir =
+                                        DateFormat('EEEE, dd MMMM yyyy', 'id_ID')
+                                            .format(dateAkhir);
+                                    return DataRow(
+                                      cells: <DataCell>[
+                                        DataCell(Text(nomor.toString())),
+                                        DataCell(Text(informasiData.nama ?? '-')),
+                                        DataCell(Text(removeHtmlTags(
+                                            informasiData.isi ?? '-'))),
+                                        DataCell(Text(tanggalMulai)),
+                                        DataCell(Text(tanggalBerakhir)),
+                                        DataCell(
+                                          Row(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  // final bimbinganId = bursaKerjaData
+                                                  //     .id; // Ambil ID siswa dari objek siswa
+                                                  // debugPrint('ID yang dipilih: $bimbinganId');
+                        
+                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
+                                                  // Navigator.push(
+                                                  //   context,
+                                                  //   MaterialPageRoute<void>(
+                                                  //     builder: (BuildContext context) =>
+                                                  //         BimbinganDetail(
+                                                  //       bimbinganId: bimbinganId,
+                                                  //     ),
+                                                  //   ),
+                                                  // );
+                                                },
+                                                child: Container(
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                          vertical: 5,
+                                                          horizontal: 5),
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.indigo.shade700,
+                                                    borderRadius:
+                                                        BorderRadius.circular(8),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.edit_document,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  // final bimbinganId = bursaKerjaData
+                                                  //     .id; // Ambil ID siswa dari objek siswa
+                                                  // debugPrint('ID yang dipilih: $bimbinganId');
+                        
+                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
+                                                  // Navigator.push(
+                                                  //   context,
+                                                  //   MaterialPageRoute<void>(
+                                                  //     builder: (BuildContext context) =>
+                                                  //         BimbinganDetail(
+                                                  //       bimbinganId: bimbinganId,
+                                                  //     ),
+                                                  //   ),
+                                                  // );
+                                                },
+                                                child: Container(
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                          vertical: 5,
+                                                          horizontal: 5),
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: GlobalColorTheme
+                                                        .errorColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(8),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.delete,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),

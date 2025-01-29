@@ -4,40 +4,56 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:si_pkl/models/admin/mayors_model.dart';
+import 'package:si_pkl/models/admin/mayors_model.dart' as mayor;
+import 'package:si_pkl/models/admin/students_model.dart';
 import 'package:si_pkl/models/admin/users_model.dart' as user;
 
-Future<void> showTambahStudentPopup(
-    {required List<user.User>? user,
-    required List<Mayor>? kelas,
+Future<void> showEditStudentPopup(
+    {required user.User? user,
+    required Student student,
+    required List<mayor.Mayor>? listKelas,
+    required mayor.Mayor kelas,
     required BuildContext context,
     required Function(
             Map<String, dynamic> data, Uint8List fileBytes, String? fileName)
         onSubmit}) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
   final TextEditingController konsentrasiController = TextEditingController();
   final TextEditingController nisnController = TextEditingController();
   final TextEditingController alamatSiswaController = TextEditingController();
   final TextEditingController alamatOrtuController = TextEditingController();
   final TextEditingController tempatLahirController = TextEditingController();
+  final TextEditingController tanggalLahirController = TextEditingController();
   final TextEditingController noHpSiswaController = TextEditingController();
   final TextEditingController noHpOrtuController = TextEditingController();
-  String? selectedJenisKelamin;
-  final users = user?.where((u) => u.role == "SISWA").toList() ?? [];
-  final kelasList = kelas?.toList();
+
+  String? selectedJenisKelamin = student.jenisKelamin;
+  konsentrasiController.text = student.konsentrasi ??'';
+  nisnController.text = student.nisn ?? '';
+  alamatSiswaController.text = student.alamatSiswa ?? '';
+  alamatOrtuController.text = student.alamatOrtu ?? '';
+  tempatLahirController.text = student.tempatLahir ?? '';
+  noHpSiswaController.text = student.hpSiswa ?? '';
+  noHpOrtuController.text = student.hpOrtu ?? '';
+  
+  final username = user?.name ?? '';
+  userNameController.text = username;
+  nameController.text = username;
+  final kelasList = listKelas?.toList();
   final int currentYear = int.parse(DateFormat('yyyy').format(DateTime.now()));
   const int startYear = 2000;
   List<String> tahunAjaranList = [];
   for (int i = startYear; i <= currentYear; i++) {
     tahunAjaranList.add('$i/${i + 1}');
   }
-  int? selectedKelas;
-  String? tahunAjaran;
-  int? selectedUserId;
-  DateTime? selectedDate;
+  int? selectedKelas = kelas.id;
+  
+  String? tahunAjaran = student.tahunMasuk;
+  DateTime? selectedDate = DateTime.parse(student.tanggalLahir!);
   Uint8List? fileBytes;
-  String? fileName;
+  String? fileName = student.foto;
   Future<void> pickDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -48,7 +64,9 @@ Future<void> showTambahStudentPopup(
     if (pickedDate != null) {
       selectedDate = pickedDate;
     }
+    
   }
+
 
   Future<void> pickFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -101,27 +119,22 @@ Future<void> showTambahStudentPopup(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      DropdownButtonFormField<int>(
-                        isExpanded: true,
-                        decoration: const InputDecoration(
+                      TextFormField(
+                        enabled: false,
+                        readOnly: true,
+                        style: GoogleFonts.poppins(color: Colors.white),
+                        controller: userNameController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
                           labelText: "USERNAME",
-                          border: OutlineInputBorder(),
+                          floatingLabelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.bold),
+                          border: const OutlineInputBorder(),
+                          fillColor: const Color.fromARGB(255, 161, 169, 177),
+                          filled: true
                         ),
-                        items: users
-                            .map((user) => DropdownMenuItem<int>(
-                                  value: user.id,
-                                  child: Text(user.name ?? ''),
-                                ))
-                            .toList(),
-                        value: selectedUserId,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedUserId = value;
-                          });
-                        },
                         validator: (value) {
-                          if (value == null) {
-                            return 'Username harus dipilih';
+                          if (value == null || value.isEmpty) {
+                            return 'username tidak boleh kosong';
                           }
                           return null;
                         },
@@ -149,7 +162,7 @@ Future<void> showTambahStudentPopup(
                         },
                         validator: (value) {
                           if (value == null) {
-                            return 'Username harus dipilih';
+                            return 'Kelas harus dipilih';
                           }
                           return null;
                         },
@@ -248,16 +261,20 @@ Future<void> showTambahStudentPopup(
                       const SizedBox(height: 10),
                       TextFormField(
                         readOnly: true,
-                        decoration: InputDecoration(
-                          floatingLabelBehavior: FloatingLabelBehavior.never,
-                          labelText: selectedDate != null
-                              ? selectedDate!.toLocal().toString().split(' ')[0]
-                              : "Pilih Tanggal",
-                          border: const OutlineInputBorder(),
+                        controller: tanggalLahirController,
+                        decoration: const InputDecoration(
+                          floatingLabelBehavior: FloatingLabelBehavior.auto,
+                          labelText: "Tanggal Lahir",
+                          border: OutlineInputBorder(),
                         ),
                         onTap: () async {
                           await pickDate(context);
-                          setState(() {});
+                          setState(() {
+                            tanggalLahirController.text = selectedDate!
+                                .toLocal()
+                                .toString()
+                                .split(' ')[0];
+                          });
                         },
                       ),
                       const SizedBox(height: 10),
@@ -331,6 +348,12 @@ Future<void> showTambahStudentPopup(
                         },
                       ),
                       const SizedBox(height: 10),
+                      if(fileBytes != null)
+                      Image.memory(fileBytes!)
+                      else if(fileName != null)
+                      Align(alignment: Alignment.centerLeft,
+                        child: Image.network('https://sigapkl-smkn2padang.com/storage/public/students-images/$fileName',height: 40,width: 40, errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 40,),)),
+                      const SizedBox(height: 5),
                       Row(
                         children: [
                           ElevatedButton(
@@ -342,8 +365,10 @@ Future<void> showTambahStudentPopup(
                           ),
                           const SizedBox(width: 10),
                           if (fileName != null)
-                            Text(fileName!,
-                                style: GoogleFonts.poppins(fontSize: 12)),
+                            Expanded(
+                              child: Text(fileName!,
+                                  style: GoogleFonts.poppins(fontSize: 12)),
+                            ),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -359,17 +384,18 @@ Future<void> showTambahStudentPopup(
                           const SizedBox(width: 10),
                           ElevatedButton(
                             onPressed: () {
+                              debugPrint(selectedDate.toString());
                               if (formKey.currentState!.validate() &&
                                   selectedDate != null &&
-                                  fileBytes != null) {
+                                  fileName != null) {
                                 onSubmit({
-                                  "user_id": selectedUserId,
                                   "mayor_id": selectedKelas,
                                   "nisn": nisnController.text,
                                   "nama": nameController.text,
-                                  "konsentrasi":konsentrasiController.text,
+                                  "konsentrasi": konsentrasiController.text,
                                   "tahun_masuk": tahunAjaran,
                                   "jenis_kelamin": selectedJenisKelamin,
+                                  "status_pkl": student.statusPkl,
                                   "tanggal_lahir":
                                       selectedDate?.toIso8601String(),
                                   "tempat_lahir": tempatLahirController.text,

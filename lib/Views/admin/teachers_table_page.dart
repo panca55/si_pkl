@@ -82,251 +82,254 @@ class TeachersTablePage extends StatelessWidget {
                         ),
                       );
                     } else {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
-                              offset: const Offset(1, 1),
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
-                              offset: const Offset(-1, -1),
-                            ),
-                          ],
-                        ),
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          scrollDirection: Axis.horizontal,
+                      return Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                offset: const Offset(1, 1),
+                              ),
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                offset: const Offset(-1, -1),
+                              ),
+                            ],
+                          ),
                           child: SingleChildScrollView(
-                            child: DataTable(
-                              clipBehavior: Clip.hardEdge,
-                              dataRowMinHeight: 45,
-                              horizontalMargin: 30,
-                              columns: <DataColumn>[
-                                DataColumn(
-                                  label: Text(
-                                    "No".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                            child: SingleChildScrollView(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                clipBehavior: Clip.hardEdge,
+                                dataRowMinHeight: 45,
+                                horizontalMargin: 30,
+                                columns: <DataColumn>[
+                                  DataColumn(
+                                    label: Text(
+                                      "No".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "nip".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "nip".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Email".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Email".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Nama Lengkap".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Nama Lengkap".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Jenis Kelamin".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Jenis Kelamin".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Golongan".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Golongan".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Bidang Studi".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Bidang Studi".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Pendidikan Terakhir".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Pendidikan Terakhir".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Jabatan".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Jabatan".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Tempat Lahir".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Tempat Lahir".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Tanggal Lahir".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Tanggal Lahir".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Alamat".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Alamat".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "No HP".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "No HP".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Foto".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Foto".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "aksi".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "aksi".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                              ],
-                              rows: List<DataRow>.generate(
-                                teacher.length,
-                                (index) {
-                                  final teacherData = teacher[index];
-                                  final nomor = index + 1;
-                                  return DataRow(
-                                    cells: <DataCell>[
-                                      DataCell(Text(nomor.toString())),
-                                      DataCell(Text(teacherData.nip ?? '-')),
-                                      DataCell(Text(
-                                          teacherData.user?.email ?? '-')),
-                                      DataCell(Text(teacherData.nama ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.jenisKelamin ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.golongan ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.bidangStudi ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.pendidikanTerakhir ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.jabatan ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.tempatLahir ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.tanggalLahir ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.alamat ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.hp ?? '-')),
-                                      DataCell(
-                                          Text(teacherData.foto ?? '-')),
-                                      DataCell(
-                                        Row(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () async {
-                                                // final bimbinganId = bursaKerjaData
-                                                //     .id; // Ambil ID siswa dari objek siswa
-                                                // debugPrint('ID yang dipilih: $bimbinganId');
-
-                                                // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                // Navigator.push(
-                                                //   context,
-                                                //   MaterialPageRoute<void>(
-                                                //     builder: (BuildContext context) =>
-                                                //         BimbinganDetail(
-                                                //       bimbinganId: bimbinganId,
-                                                //     ),
-                                                //   ),
-                                                // );
-                                              },
-                                              child: Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 5),
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.indigo.shade700,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.edit_document,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                // final bimbinganId = bursaKerjaData
-                                                //     .id; // Ambil ID siswa dari objek siswa
-                                                // debugPrint('ID yang dipilih: $bimbinganId');
-
-                                                // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                // Navigator.push(
-                                                //   context,
-                                                //   MaterialPageRoute<void>(
-                                                //     builder: (BuildContext context) =>
-                                                //         BimbinganDetail(
-                                                //       bimbinganId: bimbinganId,
-                                                //     ),
-                                                //   ),
-                                                // );
-                                              },
-                                              child: Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 5),
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: GlobalColorTheme
-                                                      .errorColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.delete,
-                                                  color: Colors.white,
+                                ],
+                                rows: List<DataRow>.generate(
+                                  teacher.length,
+                                  (index) {
+                                    final teacherData = teacher[index];
+                                    final nomor = index + 1;
+                                    return DataRow(
+                                      cells: <DataCell>[
+                                        DataCell(Text(nomor.toString())),
+                                        DataCell(Text(teacherData.nip ?? '-')),
+                                        DataCell(Text(
+                                            teacherData.user?.email ?? '-')),
+                                        DataCell(Text(teacherData.nama ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.jenisKelamin ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.golongan ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.bidangStudi ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.pendidikanTerakhir ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.jabatan ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.tempatLahir ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.tanggalLahir ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.alamat ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.hp ?? '-')),
+                                        DataCell(
+                                            Text(teacherData.foto ?? '-')),
+                                        DataCell(
+                                          Row(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  // final bimbinganId = bursaKerjaData
+                                                  //     .id; // Ambil ID siswa dari objek siswa
+                                                  // debugPrint('ID yang dipilih: $bimbinganId');
+                        
+                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
+                                                  // Navigator.push(
+                                                  //   context,
+                                                  //   MaterialPageRoute<void>(
+                                                  //     builder: (BuildContext context) =>
+                                                  //         BimbinganDetail(
+                                                  //       bimbinganId: bimbinganId,
+                                                  //     ),
+                                                  //   ),
+                                                  // );
+                                                },
+                                                child: Container(
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                          vertical: 5,
+                                                          horizontal: 5),
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.indigo.shade700,
+                                                    borderRadius:
+                                                        BorderRadius.circular(8),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.edit_document,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  // final bimbinganId = bursaKerjaData
+                                                  //     .id; // Ambil ID siswa dari objek siswa
+                                                  // debugPrint('ID yang dipilih: $bimbinganId');
+                        
+                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
+                                                  // Navigator.push(
+                                                  //   context,
+                                                  //   MaterialPageRoute<void>(
+                                                  //     builder: (BuildContext context) =>
+                                                  //         BimbinganDetail(
+                                                  //       bimbinganId: bimbinganId,
+                                                  //     ),
+                                                  //   ),
+                                                  // );
+                                                },
+                                                child: Container(
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                          vertical: 5,
+                                                          horizontal: 5),
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: GlobalColorTheme
+                                                        .errorColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(8),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.delete,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),

@@ -3,8 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/admin_sekolah/widgets/penilaian_detail.dart';
-import 'package:si_pkl/Views/guru/assessment/assessment_detail.dart';
-import 'package:si_pkl/Views/guru/assessment/assessment_edit.dart';
 import 'package:si_pkl/models/admin/evaluation/evaluations_show_model.dart';
 import 'package:si_pkl/provider/admin/evaluations_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';

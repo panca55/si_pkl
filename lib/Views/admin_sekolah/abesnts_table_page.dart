@@ -57,115 +57,118 @@ class AbesntsTablePage extends StatelessWidget {
                         ),
                       );
                     } else {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
-                              offset: const Offset(1, 1),
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
-                              offset: const Offset(-1, -1),
-                            ),
-                          ],
-                        ),
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          scrollDirection: Axis.horizontal,
+                      return Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                offset: const Offset(1, 1),
+                              ),
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                offset: const Offset(-1, -1),
+                              ),
+                            ],
+                          ),
                           child: SingleChildScrollView(
-                            child: DataTable(
-                              clipBehavior: Clip.hardEdge,
-                              dataRowMinHeight: 45,
-                              horizontalMargin: 30,
-                              columns: <DataColumn>[
-                                DataColumn(
-                                  label: Text(
-                                    "No".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                            child: SingleChildScrollView(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                clipBehavior: Clip.hardEdge,
+                                dataRowMinHeight: 45,
+                                horizontalMargin: 30,
+                                columns: <DataColumn>[
+                                  DataColumn(
+                                    label: Text(
+                                      "No".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "NISN",
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "NISN",
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Nama".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Nama".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Hadir".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Hadir".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Izin".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Izin".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Sakit".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Sakit".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Alpha".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Alpha".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    "Total".toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.black),
+                                  DataColumn(
+                                    label: Text(
+                                      "Total".toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.black),
+                                    ),
                                   ),
+                                ],
+                                rows: List<DataRow>.generate(
+                                  absent.length,
+                                  (index) {
+                                    final absentData = absent[index];
+                                    final nomor = index + 1;
+                                    return DataRow(
+                                      cells: <DataCell>[
+                                        DataCell(Text(nomor.toString())),
+                                        DataCell(Text(absentData.nisn ?? '-')),
+                                        DataCell(Text(absentData.nama ?? '-')),
+                                        DataCell(Text(absentData.absents?.hadir
+                                                .toString() ??
+                                            '0')),
+                                        DataCell(Text(
+                                            absentData.absents?.izin.toString() ??
+                                                '0')),
+                                        DataCell(Text(absentData.absents?.sakit
+                                                .toString() ??
+                                            '0')),
+                                        DataCell(Text(absentData.absents?.alpha
+                                                .toString() ??
+                                            '0')),
+                                        DataCell(Text(absentData.absents?.total
+                                                .toString() ??
+                                            '0')),
+                                      ],
+                                    );
+                                  },
                                 ),
-                              ],
-                              rows: List<DataRow>.generate(
-                                absent.length,
-                                (index) {
-                                  final absentData = absent[index];
-                                  final nomor = index + 1;
-                                  return DataRow(
-                                    cells: <DataCell>[
-                                      DataCell(Text(nomor.toString())),
-                                      DataCell(Text(absentData.nisn ?? '-')),
-                                      DataCell(Text(absentData.nama ?? '-')),
-                                      DataCell(Text(absentData.absents?.hadir
-                                              .toString() ??
-                                          '0')),
-                                      DataCell(Text(
-                                          absentData.absents?.izin.toString() ??
-                                              '0')),
-                                      DataCell(Text(absentData.absents?.sakit
-                                              .toString() ??
-                                          '0')),
-                                      DataCell(Text(absentData.absents?.alpha
-                                              .toString() ??
-                                          '0')),
-                                      DataCell(Text(absentData.absents?.total
-                                              .toString() ??
-                                          '0')),
-                                    ],
-                                  );
-                                },
                               ),
                             ),
                           ),

@@ -1,11 +1,59 @@
 class EvaluationsModel {
   List<Internship>? internship;
-  EvaluationsModel({this.internship});
+  List<Evaluations>? evaluations;
+  List<EvaluationDates>? evaluationsDates;
+  EvaluationsModel({this.internship, this.evaluations, this.evaluationsDates});
 
   factory EvaluationsModel.fromJson(Map<String, dynamic> json) {
     return EvaluationsModel(
       internship: List<Internship>.from(json['internships']
           .map((internship) => Internship.fromJson(internship))),
+      evaluations: List<Evaluations>.from(json['evaluations']
+          .map((evaluation) => Evaluations.fromJson(evaluation))),
+      evaluationsDates: List<EvaluationDates>.from(json['evaluation_dates']
+          .map((evaluationDate) => EvaluationDates.fromJson(evaluationDate))),
+    );
+  }
+}
+class Evaluations{
+  int? id;
+  int? internshipId;
+  int? monitoring;
+  int? sertifikat;
+  int? logbook;
+  int? presentasi;
+  int? nilaiAkhir;
+  String? createdAt;
+  String? updatedAt;
+  Evaluations({this.id, this.internshipId, this.monitoring, this.sertifikat, this.logbook, this.presentasi, this.nilaiAkhir, this.createdAt, this.updatedAt});
+  factory Evaluations.fromJson(Map<String, dynamic> json) {
+    return Evaluations(
+      id: json['id'] as int,
+      internshipId: json['internship_id'] as int,
+      monitoring: json['monitoring'] as int,
+      sertifikat: json['sertifikat'] as int,
+      logbook: json['logbook'] as int,
+      presentasi: json['presentasi'] as int,
+      nilaiAkhir: json['nilai_akhir'] as int,
+      createdAt: json['created_at'] as String,
+      updatedAt: json['updated_at'] as String,
+    );
+  }
+}
+class EvaluationDates{
+  int? id;
+  DateTime? startDate;
+  DateTime? endDate;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  EvaluationDates({this.id, this.startDate, this.endDate, this.createdAt, this.updatedAt});
+  factory EvaluationDates.fromJson(Map<String, dynamic> json) {
+    return EvaluationDates(
+      id: json['id'] as int,
+      startDate: json['start_date'] as DateTime,
+      endDate: json['end_date'] as DateTime,
+      createdAt: json['created_at'] as DateTime,
+      updatedAt: json['updated_at'] as DateTime,
     );
   }
 }

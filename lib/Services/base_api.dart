@@ -26,6 +26,7 @@ class BaseApi{
   var addInfoPath = Uri.parse("$api/info");
   var addDepartmentPath = Uri.parse("$api/department");
   var addTeacherPath = Uri.parse("$api/teacher");
+  var addStudentPath = Uri.parse("$api/student");
   var addInstrukturPath = Uri.parse("$api/instruktur");
   var addCorporatePath = Uri.parse("$api/korporat");
   var toggleActivePath = Uri.parse("$api/user/active");
@@ -47,6 +48,7 @@ class BaseApi{
   static int? id;
 
   Uri siswaIndexPath(int? id) => Uri.parse("$api/pimpinan/siswa/$id");
+  Uri editStudentPath(int? id) => Uri.parse("$api/student/$id");
   Uri bimbinganIndexPath(int? id) => Uri.parse("$api/teacher/bimbingan/$id");
   Uri bimbinganInstrukturIndexPath(int? id) => Uri.parse("$api/instruktur/bimbingan/$id");
   Uri detailLogbookGuruPath(int? id) => Uri.parse("$api/teacher/bimbingan/logbook/$id");
