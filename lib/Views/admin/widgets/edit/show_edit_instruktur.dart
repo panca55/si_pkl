@@ -3,16 +3,14 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
-import 'package:si_pkl/models/admin/mayors_model.dart' as mayor;
-import 'package:si_pkl/models/admin/students_model.dart';
+import 'package:si_pkl/models/admin/instructors_model.dart';
 import 'package:si_pkl/models/admin/users_model.dart' as user;
+import 'package:si_pkl/models/admin/corporations_model.dart' as corporation;
 
-Future<void> showEditStudentPopup(
+Future<void> showEditInstrukturPopup(
     {required user.User? user,
-    required Student student,
-    required List<mayor.Mayor>? listKelas,
-    required mayor.Mayor kelas,
+    required corporation.Corporations? perusahaan,
+    required Instructor instructor,
     required BuildContext context,
     required Function(
             Map<String, dynamic> data, Uint8List fileBytes, String? fileName)
@@ -20,41 +18,26 @@ Future<void> showEditStudentPopup(
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
-  final TextEditingController konsentrasiController = TextEditingController();
-  final TextEditingController nisnController = TextEditingController();
-  final TextEditingController alamatSiswaController = TextEditingController();
-  final TextEditingController alamatOrtuController = TextEditingController();
+  final TextEditingController namaPerusahaanController = TextEditingController();
+  final TextEditingController nipController = TextEditingController();
+  final TextEditingController alamatController = TextEditingController();
   final TextEditingController tempatLahirController = TextEditingController();
   final TextEditingController tanggalLahirController = TextEditingController();
-  final TextEditingController noHpSiswaController = TextEditingController();
-  final TextEditingController noHpOrtuController = TextEditingController();
-
-  String? selectedJenisKelamin = student.jenisKelamin;
-  konsentrasiController.text = student.konsentrasi ??'';
-  nisnController.text = student.nisn ?? '';
-  alamatSiswaController.text = student.alamatSiswa ?? '';
-  alamatOrtuController.text = student.alamatOrtu ?? '';
-  tempatLahirController.text = student.tempatLahir ?? '';
-  noHpSiswaController.text = student.hpSiswa ?? '';
-  noHpOrtuController.text = student.hpOrtu ?? '';
-  
-  final username = user?.name ?? '';
-  userNameController.text = username;
-  nameController.text = username;
-  final kelasList = listKelas?.toList();
-  final int currentYear = int.parse(DateFormat('yyyy').format(DateTime.now()));
-  const int startYear = 2000;
-  List<String> tahunAjaranList = [];
-  for (int i = startYear; i <= currentYear; i++) {
-    tahunAjaranList.add('$i/${i + 1}');
-  }
-  int? selectedKelas = kelas.id;
-  
-  String? tahunAjaran = student.tahunMasuk;
-  DateTime? selectedDate = DateTime.parse(student.tanggalLahir!);
-  tanggalLahirController.text = student.tanggalLahir ?? '';
+  final TextEditingController noHpController = TextEditingController();
+  String? selectedJenisKelamin = instructor.jenisKelamin;
+  nameController.text = instructor.nama ?? '';
+  nipController.text = instructor.nip ?? '';
+  alamatController.text = instructor.alamat ?? '';
+  tempatLahirController.text = instructor.tempatLahir ?? '';
+  noHpController.text = instructor.hp ?? '';
+  tanggalLahirController.text = instructor.tanggalLahir ?? '';
+  int? selectedCorporationId = perusahaan?.id;
+  int? selectedUserId = user?.id;
+  userNameController.text = user?.name ?? '';
+  namaPerusahaanController.text = perusahaan?.nama ?? '';
+  DateTime? selectedDate = DateTime.parse(instructor.tanggalLahir!);
   Uint8List? fileBytes;
-  String? fileName = student.foto;
+  String? fileName;
   Future<void> pickDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -65,9 +48,7 @@ Future<void> showEditStudentPopup(
     if (pickedDate != null) {
       selectedDate = pickedDate;
     }
-    
   }
-
 
   Future<void> pickFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -127,12 +108,13 @@ Future<void> showEditStudentPopup(
                         controller: userNameController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          labelText: "USERNAME",
-                          floatingLabelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.bold),
-                          border: const OutlineInputBorder(),
-                          fillColor: const Color.fromARGB(255, 161, 169, 177),
-                          filled: true
-                        ),
+                            labelText: "USERNAME",
+                            floatingLabelStyle: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                            border: const OutlineInputBorder(),
+                            fillColor: const Color.fromARGB(255, 161, 169, 177),
+                            filled: true),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'username tidak boleh kosong';
@@ -140,47 +122,40 @@ Future<void> showEditStudentPopup(
                           return null;
                         },
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      DropdownButtonFormField<int>(
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          labelText: "KELAS",
-                          border: OutlineInputBorder(),
-                        ),
-                        items: kelasList!
-                            .map((kelas) => DropdownMenuItem<int>(
-                                  value: kelas.id,
-                                  child: Text(kelas.nama ?? ''),
-                                ))
-                            .toList(),
-                        value: selectedKelas,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedKelas = value;
-                          });
-                        },
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        enabled: false,
+                        readOnly: true,
+                        style: GoogleFonts.poppins(color: Colors.white),
+                        controller: namaPerusahaanController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                            labelText: "PERUSAHAAN",
+                            floatingLabelStyle: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                            border: const OutlineInputBorder(),
+                            fillColor: const Color.fromARGB(255, 161, 169, 177),
+                            filled: true),
                         validator: (value) {
-                          if (value == null) {
-                            return 'Kelas harus dipilih';
+                          if (value == null || value.isEmpty) {
+                            return 'perusahaan tidak boleh kosong';
                           }
                           return null;
                         },
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
+                      // Title
                       TextFormField(
-                        controller: nisnController,
+                        controller: nipController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          labelText: "NISN",
+                          labelText: "NIP",
                           border: OutlineInputBorder(),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'NISN tidak boleh kosong';
+                            return 'nip tidak boleh kosong';
                           }
                           return null;
                         },
@@ -195,43 +170,10 @@ Future<void> showEditStudentPopup(
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Username tidak boleh kosong';
+                            return 'nama tidak boleh kosong';
                           }
                           return null;
                         },
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: konsentrasiController,
-                        decoration: const InputDecoration(
-                          labelText: "KONSENTRASI",
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'konsentrasi tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: "TAHUN AJARAN",
-                          border: OutlineInputBorder(),
-                        ),
-                        value: tahunAjaran,
-                        onChanged: (newValue) {
-                          setState(() {
-                            tahunAjaran = newValue;
-                          });
-                        },
-                        items: tahunAjaranList.map((tahunAjaran) {
-                          return DropdownMenuItem<String>(
-                            value: tahunAjaran,
-                            child: Text(tahunAjaran),
-                          );
-                        }).toList(),
                       ),
                       const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
@@ -254,7 +196,7 @@ Future<void> showEditStudentPopup(
                         },
                         validator: (value) {
                           if (value == null) {
-                            return 'Golongan harus dipilih';
+                            return 'jenis kelamin harus dipilih';
                           }
                           return null;
                         },
@@ -287,75 +229,57 @@ Future<void> showEditStudentPopup(
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Username tidak boleh kosong';
+                            return 'tempat lahir tidak boleh kosong';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
-                        controller: alamatSiswaController,
+                        controller: alamatController,
                         decoration: const InputDecoration(
                           labelText: "ALAMAT LENGKAP",
                           border: OutlineInputBorder(),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Username tidak boleh kosong';
+                            return 'alamat tidak boleh kosong';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
-                        controller: alamatOrtuController,
+                        controller: noHpController,
                         decoration: const InputDecoration(
-                          labelText: "ALAMAT ORTU",
+                          labelText: "NO HP",
                           border: OutlineInputBorder(),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'alamat ortu tidak boleh kosong';
+                            return 'no hp tidak boleh kosong';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 10),
-                      TextFormField(
-                        controller: noHpSiswaController,
-                        decoration: const InputDecoration(
-                          labelText: "NO HP SISWA",
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Username tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: noHpOrtuController,
-                        decoration: const InputDecoration(
-                          labelText: "NO HP ORTU",
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Username tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      if(fileBytes != null)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Image.memory(fileBytes!))
-                      else if(fileName != null)
-                      Align(alignment: Alignment.centerLeft,
-                        child: Image.network('https://sigapkl-smkn2padang.com/storage/public/students-images/$fileName',height: 40,width: 40, errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 40,),)),
+                      if (fileBytes != null)
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.memory(fileBytes!))
+                      else if (fileName != null)
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.network(
+                              'https://sigapkl-smkn2padang.com/storage/public/instructors-images/$fileName',
+                              height: 40,
+                              width: 40,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                Icons.image,
+                                size: 40,
+                              ),
+                            )),
                       const SizedBox(height: 5),
                       Row(
                         children: [
@@ -387,25 +311,20 @@ Future<void> showEditStudentPopup(
                           const SizedBox(width: 10),
                           ElevatedButton(
                             onPressed: () {
-                              debugPrint(selectedDate.toString());
                               if (formKey.currentState!.validate() &&
                                   selectedDate != null &&
-                                  fileName != null) {
+                                  fileBytes != null) {
                                 onSubmit({
-                                  "mayor_id": selectedKelas,
-                                  "nisn": nisnController.text,
+                                  "user_id": selectedUserId,
+                                  "corporation_id": selectedCorporationId,
+                                  "nip": nipController.text,
                                   "nama": nameController.text,
-                                  "konsentrasi": konsentrasiController.text,
-                                  "tahun_masuk": tahunAjaran,
                                   "jenis_kelamin": selectedJenisKelamin,
-                                  "status_pkl": student.statusPkl,
                                   "tanggal_lahir":
                                       selectedDate?.toIso8601String(),
                                   "tempat_lahir": tempatLahirController.text,
-                                  "alamat_siswa": alamatSiswaController.text,
-                                  "alamat_ortu": alamatOrtuController.text,
-                                  "hp_siswa": noHpSiswaController.text,
-                                  "hp_ortu": noHpOrtuController.text,
+                                  "alamat": alamatController.text,
+                                  "hp": noHpController.text,
                                 }, fileBytes!, fileName);
                                 Navigator.of(context).pop();
                               }

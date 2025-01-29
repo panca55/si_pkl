@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/admin/widgets/edit/show_edit_instruktur.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_instruktur.dart';
 import 'package:si_pkl/provider/admin/corporations_provider.dart';
 import 'package:si_pkl/provider/admin/instructors_provider.dart';
@@ -257,20 +258,27 @@ class _InstructorsTablePageState extends State<InstructorsTablePage> {
                                             children: [
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  final userModel =
+                                                      user?.firstWhere(
+                                                          (u) =>
+                                                              u.id ==
+                                                              instrukturData.userId);
+                                                  final perusahaanModel =
+                                                      perusahaan?.firstWhere(
+                                                          (u) =>
+                                                              u.id ==
+                                                              instrukturData.corporationId);
+                                                  final id = instrukturData.id;
+                                                  final instructor = instruktur.firstWhere((i)=> i.id == instrukturData.id);
+                                                  showEditInstrukturPopup(user: userModel,perusahaan: perusahaanModel,instructor:instructor , context: context, onSubmit: (data,fileByte, fileName)async{
+                                                    await instructorsProvider.editInstructor(id: id!, data: data, fileBytes: fileByte, fileName: fileName).then((value){
+                                                      instructorsProvider.getInstructors();
+                                                      setState(() {});
+                                                    });
+                                                  },);
+                                                  await instructorsProvider
+                                                      .getInstructors();
+                                                  setState(() {});
                                                 },
                                                 child: Container(
                                                   margin:

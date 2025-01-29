@@ -103,4 +103,67 @@ class InstructorsProvider extends BaseApi with ChangeNotifier {
       debugPrint('Error submitKomentar: $e');
     }
   }
+  Future<void> editInstructor({
+    required int id,
+    required Map<String, dynamic> data,
+    required Uint8List? fileBytes,
+    String? fileName,
+  }) async {
+    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    try {
+      final uri = super.editInstrukturPath(id);
+
+      // Mengecek jika fileBytes ada dan bukan null
+      if (fileBytes != null) {
+        // Mengecek apakah file adalah gambar dengan ekstensi yang diterima
+        final allowedExtensions = ['jpg', 'jpeg', 'png'];
+        final fileExtension = fileName?.split('.').last.toLowerCase();
+
+        if (fileExtension != null &&
+            !allowedExtensions.contains(fileExtension)) {
+          debugPrint('Format gambar tidak didukung');
+          throw Exception('Format gambar tidak didukung');
+        }
+
+        // Membatasi ukuran file jika lebih dari 2MB
+        if (fileBytes.length > 2 * 1024 * 1024) {
+          debugPrint('Ukuran gambar terlalu besar, maksimal 2MB');
+          throw Exception('Ukuran gambar terlalu besar, maksimal 2MB');
+        }
+
+        // Mengonversi foto menjadi base64
+        String base64Image = base64Encode(fileBytes);
+        data['foto'] = base64Image;
+      }
+
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.put(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data), // Kirim data sebagai JSON
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+      final responseBody = response.body;
+      debugPrint('Response Body: $responseBody');
+      debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = json.decode(responseBody);
+        debugPrint('Berhasil edit data siswa');
+        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+        _instructorsModel = InstructorsModel.fromJson(responseData);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error edit data siswa: $e');
+    }
+  }
 }
