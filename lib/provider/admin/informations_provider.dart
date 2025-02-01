@@ -8,12 +8,43 @@ import 'package:si_pkl/models/admin/informations_model.dart';
 class InformationsProvider extends BaseApi with ChangeNotifier {
   InformationsModel? _informationsModel;
   InformationsModel? get informationsModel => _informationsModel;
+  final List<Information> _information = [];
+  List<Information> get informations => _information;
   final AuthController authController;
   InformationsProvider({required this.authController});
 
+  Future<void> deleteUser({
+    required int id,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.editInfoPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Berhasil menghapus data user:');
+        _information.removeWhere((user) => user.id == id);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal menghapus data user:: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error menghapus data user:: $e');
+    }
+  }
   Future<void> getInformations() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
@@ -43,8 +74,7 @@ class InformationsProvider extends BaseApi with ChangeNotifier {
   Future<void> addInfo({
     required Map<String, dynamic> data,
   }) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.addInfoPath;
       final requestBody = data;
@@ -71,6 +101,44 @@ class InformationsProvider extends BaseApi with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error submitKomentar: $e');
+    }
+  }
+  Future<void> editInfo({
+    required int id,
+    required Map<String, dynamic> data,
+    String? fileName,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.editInfoPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.put(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data), // Kirim data sebagai JSON
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+      final responseBody = response.body;
+      debugPrint('Response Body: $responseBody');
+      debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = json.decode(responseBody);
+        debugPrint('Berhasil edit data siswa');
+        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+        _informationsModel = InformationsModel.fromJson(responseData);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error edit data siswa: $e');
     }
   }
 }

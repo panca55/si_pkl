@@ -10,12 +10,44 @@ import 'package:universal_io/io.dart' as universal_io;
 class TeachersProvider extends BaseApi with ChangeNotifier {
   TeachersModel? _teachersModel;
   TeachersModel? get teachersModel => _teachersModel;
+  final List<Teacher> _teacher =[];
+  List<Teacher> get teacher => _teacher;
   final AuthController authController;
   TeachersProvider({required this.authController});
 
+
+  Future<void> deleteUser({
+    required int id,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.deleteTeacherPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Berhasil menghapus data user:');
+        _teacher.removeWhere((user) => user.id == id);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal menghapus data user:: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error menghapus data user:: $e');
+    }
+  }
   Future<void> getTeachers() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
@@ -48,8 +80,7 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
     String? filePath,
     String? fileName
   }) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.addTeacherPath;
       final request = http.MultipartRequest('POST', uri)
@@ -104,6 +135,70 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error submitKomentar: $e');
+    }
+  }
+  
+  Future<void> editTeacher({
+    required int id,
+    required Map<String, dynamic> data,
+    required Uint8List? fileBytes,
+    String? fileName,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.editTeacherPath(id);
+
+      // Mengecek jika fileBytes ada dan bukan null
+      if (fileBytes != null) {
+        // Mengecek apakah file adalah gambar dengan ekstensi yang diterima
+        final allowedExtensions = ['jpg', 'jpeg', 'png'];
+        final fileExtension = fileName?.split('.').last.toLowerCase();
+
+        if (fileExtension != null &&
+            !allowedExtensions.contains(fileExtension)) {
+          debugPrint('Format gambar tidak didukung');
+          throw Exception('Format gambar tidak didukung');
+        }
+
+        // Membatasi ukuran file jika lebih dari 2MB
+        if (fileBytes.length > 2 * 1024 * 1024) {
+          debugPrint('Ukuran gambar terlalu besar, maksimal 2MB');
+          throw Exception('Ukuran gambar terlalu besar, maksimal 2MB');
+        }
+
+        // Mengonversi foto menjadi base64
+        String base64Image = base64Encode(fileBytes);
+        data['foto'] = base64Image;
+      }
+
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.put(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data), // Kirim data sebagai JSON
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+      final responseBody = response.body;
+      debugPrint('Response Body: $responseBody');
+      debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = json.decode(responseBody);
+        debugPrint('Berhasil edit data siswa');
+        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+        _teachersModel= TeachersModel.fromJson(responseData);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error edit data siswa: $e');
     }
   }
 }

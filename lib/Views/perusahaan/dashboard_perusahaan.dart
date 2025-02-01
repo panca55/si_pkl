@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/perusahaan/widgets/show_add_instruktur_popup.dart';
 import 'package:si_pkl/provider/perusahaan/dashboard_provider.dart';
-import 'package:si_pkl/provider/user_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 

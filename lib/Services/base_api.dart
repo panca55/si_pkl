@@ -1,6 +1,7 @@
 class BaseApi{
   static var base =  "http://127.0.0.1:8000";
   static var api = "$base/api";
+  
   var authPath = Uri.parse("$api/login");
   var registerPath = Uri.parse("$api/register");
   var logoutPath = Uri.parse("$api/logout");
@@ -49,6 +50,16 @@ class BaseApi{
 
   Uri siswaIndexPath(int? id) => Uri.parse("$api/pimpinan/siswa/$id");
   Uri editStudentPath(int? id) => Uri.parse("$api/student/$id");
+  Uri editMayorPath(int? id) => Uri.parse("$api/mayor/$id");
+  Uri editUserPath(int? id) => Uri.parse("$api/users/$id");
+  Uri deleteUserPath(int? id) => Uri.parse("$api/users/$id");
+  Uri editDepartmentPath(int? id) => Uri.parse("$api/department/update/$id");
+  Uri deleteDepartmentPath(int? id) => Uri.parse("$api/department/$id");
+  Uri editInfoPath(int? id) => Uri.parse("$api/info/$id");
+  Uri editTeacherPath(int? id) => Uri.parse("$api/teacher/$id");
+  Uri deleteTeacherPath(int? id) => Uri.parse("$api/teacher/$id");
+  Uri editCorporatePath(int? id) => Uri.parse("$api/korporat/update/$id");
+  Uri deleteCorporatePath(int? id) => Uri.parse("$api/korporat/$id");
   Uri editInstrukturPath(int? id) => Uri.parse("$api/instruktur/$id");
   Uri bimbinganIndexPath(int? id) => Uri.parse("$api/teacher/bimbingan/$id");
   Uri bimbinganInstrukturIndexPath(int? id) => Uri.parse("$api/instruktur/bimbingan/$id");

@@ -13,8 +13,7 @@ class ProfileInstrukturProvider extends BaseApi with ChangeNotifier {
   ProfileInstrukturProvider({required this.authController});
 
   Future<void> getProfileguru() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
     try {
       http.Response response = await http.get(
         super.instrukturProfilePath,

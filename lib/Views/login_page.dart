@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +28,34 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Fungsi untuk menampilkan toast error
+    void showErrorToast(BuildContext context, String message) {
+      toastification.show(
+        context: context,
+        type: ToastificationType.error,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 5),
+        title: Text(message, style: GoogleFonts.poppins(color: Colors.white)),
+        alignment: Alignment.topRight,
+        direction: TextDirection.ltr,
+        animationDuration: const Duration(milliseconds: 300),
+        icon: const Icon(Icons.error_outline),
+        primaryColor: GlobalColorTheme.errorColor,
+        backgroundColor: Colors.white,
+        showIcon: true,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 16,
+            offset: Offset(0, 16),
+            spreadRadius: 0,
+          )
+        ],
+      );
+    }
     final authProvider = Provider.of<AuthController>(context);
     return Scaffold(
       backgroundColor: Colors.white,
@@ -176,172 +206,79 @@ class _LoginPageState extends State<LoginPage> {
                                 onTap: () async {
                                   if (_formKey.currentState!.validate()) {
                                     try {
+                                      final email = _emailController.text;
+                                      final password = _passwordController.text;
+
                                       await authProvider
-                                          .login(_emailController.text,
-                                              _passwordController.text)
+                                          .login(email, password)
                                           .then((value) {
                                         debugPrint('Login successful');
                                       });
-                                      if (authProvider.currentUser != null &&
-                                          authProvider.currentUser!.user !=
-                                              null) {
-                                        if (authProvider
-                                                .currentUser?.user?.role ==
-                                            'PIMPINAN') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const DashboardSidePimpinan()));
-                                        } else if (authProvider
-                                                .currentUser?.user?.role ==
-                                            'SISWA') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
+
+                                      final currentUser =
+                                          authProvider.currentUser?.user;
+                                      if (currentUser == null) {
+                                        showErrorToast(context,
+                                            'Gagal Login: Akun tidak ditemukan');
+                                        return;
+                                      }
+
+                                      if (currentUser.isActive != 1) {
+                                        showErrorToast(context,
+                                            'Gagal Login: Akun tidak aktif');
+                                        return;
+                                      }
+                                      final ctx = context;
+                                      switch (currentUser.role) {
+                                        case 'PIMPINAN':
+                                        case 'KEPSEK':
+                                        case 'WAKASEK':
+                                        case 'DAPODIK':
+                                        case 'WAKAKURIKULUM':
+                                          Navigator.of(ctx).push(MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const DashboardSidePimpinan()));
+                                          break;
+                                        case 'SISWA':
+                                          Navigator.of(ctx).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       const DashboardSide()));
-                                        } else if (authProvider
-                                                .currentUser?.user?.role ==
-                                            'ADMIN') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const DashboardSideAdmin()));
-                                        } else if (authProvider
-                                                .currentUser?.user?.role ==
-                                            'INSTRUKTUR') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const DashboardSideInstruktur()));
-                                        } else if (authProvider
-                                                .currentUser?.user?.role ==
-                                            'PERUSAHAAN') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const DashboardSideAdmin()));
-                                        } else if (authProvider
-                                                .currentUser?.user?.role ==
-                                            'GURU') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
+                                          break;
+                                        case 'ADMIN':
+                                        case 'PERUSAHAAN':
+                                          Navigator.of(ctx).push(MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const DashboardSideAdmin()));
+                                          break;
+                                        case 'INSTRUKTUR':
+                                          Navigator.of(ctx).push(MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const DashboardSideInstruktur()));
+                                          break;
+                                        case 'GURU':
+                                          Navigator.of(ctx).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       const DashboardSideGuru()));
-                                        } else if (authProvider
-                                                .currentUser?.user?.role ==
-                                            'WAKAHUMAS') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const DashboardSideAdminSekolah()));
-                                        } else if (authProvider
-                                                    .currentUser?.user?.role ==
-                                                'KEPSEK' ||
-                                            authProvider
-                                                    .currentUser?.user?.role ==
-                                                'WAKASEK' ||
-                                            authProvider
-                                                    .currentUser?.user?.role ==
-                                                'DAPODIK' ||
-                                            authProvider
-                                                    .currentUser?.user?.role ==
-                                                'WAKAKURIKULUM') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const DashboardSidePimpinan()));
-                                        } else {
-                                          toastification.show(
-                                            // ignore: use_build_context_synchronously
-                                            context: context,
-                                            type: ToastificationType.error,
-                                            style:
-                                                ToastificationStyle.fillColored,
-                                            autoCloseDuration:
-                                                const Duration(seconds: 5),
-                                            title: Text(
-                                              'Gagal Login',
-                                              style: GoogleFonts.poppins(
-                                                  color: Colors.white),
-                                            ),
-                                            alignment: Alignment.topRight,
-                                            direction: TextDirection.ltr,
-                                            animationDuration: const Duration(
-                                                milliseconds: 300),
-                                            icon:
-                                                const Icon(Icons.error_outline),
-                                            primaryColor:
-                                                GlobalColorTheme.errorColor,
-                                            backgroundColor: Colors.white,
-                                            showIcon: true,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 16),
-                                            margin: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 8),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Color(0x07000000),
-                                                blurRadius: 16,
-                                                offset: Offset(0, 16),
-                                                spreadRadius: 0,
-                                              )
-                                            ],
-                                          );
-                                        }
-                                      } else {
-                                        toastification.show(
-                                          // ignore: use_build_context_synchronously
-                                          context: context,
-                                          type: ToastificationType.error,
-                                          style:
-                                              ToastificationStyle.fillColored,
-                                          autoCloseDuration:
-                                              const Duration(seconds: 5),
-                                          title: Text(
-                                            'Gagal Login',
-                                            style: GoogleFonts.poppins(
-                                                color: Colors.white),
-                                          ),
-                                          alignment: Alignment.topRight,
-                                          direction: TextDirection.ltr,
-                                          animationDuration:
-                                              const Duration(milliseconds: 300),
-                                          icon: const Icon(Icons.error_outline),
-                                          primaryColor:
-                                              GlobalColorTheme.errorColor,
-                                          backgroundColor: Colors.white,
-                                          showIcon: true,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 16),
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 8),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Color(0x07000000),
-                                              blurRadius: 16,
-                                              offset: Offset(0, 16),
-                                              spreadRadius: 0,
-                                            )
-                                          ],
-                                        );
+                                          break;
+                                        case 'WAKAHUMAS':
+                                          Navigator.of(ctx).push(MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const DashboardSideAdminSekolah()));
+                                          break;
+                                        default:
+                                          showErrorToast(ctx, 'Gagal Login');
+                                          break;
                                       }
                                     } catch (e) {
                                       debugPrint('Error login: $e');
+                                      showErrorToast(context,
+                                          'Terjadi kesalahan saat login');
                                     }
                                   }
-                                }),
+                                }
+                                ),
                           ),
                         ],
                       ),

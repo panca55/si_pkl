@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/admin/widgets/edit/show_edit_instruktur.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_instruktur.dart';
@@ -23,6 +24,32 @@ class _InstructorsTablePageState extends State<InstructorsTablePage> {
     final userProvider = Provider.of<UsersProvider>(context, listen: false);
     final coporateProvider =
         Provider.of<CorporationsProvider>(context, listen: false);
+    void showDeleteDialog(BuildContext context, int id) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Konfirmasi"),
+            content: const Text("Apakah Anda yakin ingin menghapus data ini?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await instructorsProvider.deleteUser(id: id);
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                  instructorsProvider.getInstructors();
+                },
+                child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+              )
+            ],
+          );
+        },
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
@@ -231,6 +258,11 @@ class _InstructorsTablePageState extends State<InstructorsTablePage> {
                                   (index) {
                                     final instrukturData = instruktur[index];
                                     final nomor = index + 1;
+                                    final DateTime dateLahir = DateTime.parse(
+                                        instrukturData.tanggalLahir!);
+                                    String tanggalLahir = DateFormat(
+                                            'EEEE, dd MMMM yyyy', 'id_ID')
+                                        .format(dateLahir);
                                     return DataRow(
                                       cells: <DataCell>[
                                         DataCell(Text(nomor.toString())),
@@ -247,7 +279,7 @@ class _InstructorsTablePageState extends State<InstructorsTablePage> {
                                         DataCell(Text(
                                             instrukturData.tempatLahir ?? '-')),
                                         DataCell(Text(
-                                            instrukturData.tanggalLahir ?? '-')),
+                                            tanggalLahir)),
                                         DataCell(
                                             Text(instrukturData.alamat ?? '-')),
                                         DataCell(Text(instrukturData.hp ?? '-')),
@@ -303,20 +335,7 @@ class _InstructorsTablePageState extends State<InstructorsTablePage> {
                                               ),
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  showDeleteDialog(context, instrukturData.id!);
                                                 },
                                                 child: Container(
                                                   margin:

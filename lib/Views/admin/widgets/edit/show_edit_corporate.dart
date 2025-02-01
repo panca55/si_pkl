@@ -15,6 +15,8 @@ Future<void> showEditPerusahaanPopup(
         onSubmit}) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController jamMulaiController = TextEditingController();
+  final TextEditingController jamBerakhirController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController quotaController = TextEditingController();
   final TextEditingController alamatController = TextEditingController();
@@ -29,11 +31,13 @@ Future<void> showEditPerusahaanPopup(
   String? akhirHariKerja = perusahaan.akhirHariKerja;
   int? selectedUserId = user?.id;
   Uint8List? fileBytes;
-  String? fileName;
-  final jamMulai = DateTime.parse(perusahaan.jamMulai!);
-  final jamBerakhir = DateTime.parse(perusahaan.jamBerakhir!);
-  TimeOfDay? selectedStartTime = TimeOfDay.fromDateTime(jamMulai);
-  TimeOfDay? selectedEndTime = TimeOfDay.fromDateTime(jamBerakhir);
+  String? fileName = perusahaan.foto;
+  final jamMulai = perusahaan.jamMulai;
+  final jamBerakhir = perusahaan.jamBerakhir;
+  jamMulaiController.text = jamMulai ?? '';
+  jamBerakhirController.text = jamBerakhir ?? '';
+  TimeOfDay? selectedStartTime;
+  TimeOfDay? selectedEndTime;
 
   Future<void> pickFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -210,15 +214,20 @@ Future<void> showEditPerusahaanPopup(
                           Expanded(
                             child: TextFormField(
                               readOnly: true,
-                              decoration: InputDecoration(
-                                labelText: selectedStartTime != null
-                                    ? selectedStartTime!.format(context)
-                                    : "Pilih Waktu Mulai",
-                                border: const OutlineInputBorder(),
+                              controller: jamMulaiController,
+                              decoration: const InputDecoration(
+                                suffixIcon: Icon(
+                                  Icons.access_time_outlined,
+                                  color: Colors.black,
+                                ),
+                                labelText: "Waktu Mulai",
+                                border: OutlineInputBorder(),
                               ),
                               onTap: () async {
                                 await pickTime(context, true);
-                                setState(() {});
+                                setState(() {
+                                  jamMulaiController.text = selectedStartTime!.format(context);
+                                });
                               },
                             ),
                           ),
@@ -226,15 +235,18 @@ Future<void> showEditPerusahaanPopup(
                           Expanded(
                             child: TextFormField(
                               readOnly: true,
-                              decoration: InputDecoration(
-                                labelText: selectedEndTime != null
-                                    ? selectedEndTime!.format(context)
-                                    : "Pilih Waktu Selesai",
-                                border: const OutlineInputBorder(),
+                              controller: jamBerakhirController,
+                              decoration: const InputDecoration(
+                                suffixIcon: Icon(Icons.access_time_outlined, color: Colors.black,),
+                                labelText: "Waktu Selesai",
+                                border: OutlineInputBorder(),
                               ),
                               onTap: () async {
                                 await pickTime(context, false);
-                                setState(() {});
+                                setState(() {
+                                  jamBerakhirController.text =
+                                      selectedStartTime!.format(context);
+                                });
                               },
                             ),
                           ),
@@ -269,6 +281,24 @@ Future<void> showEditPerusahaanPopup(
                         },
                       ),
                       const SizedBox(height: 10),
+                      if (fileBytes != null)
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.memory(fileBytes!))
+                      else if (fileName != null)
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.network(
+                              'https://sigapkl-smkn2padang.com/storage/public/corporations-images/$fileName',
+                              height: 40,
+                              width: 40,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                Icons.image,
+                                size: 40,
+                              ),
+                            )),
+                      const SizedBox(height: 5),
                       Row(
                         children: [
                           ElevatedButton(
@@ -280,8 +310,10 @@ Future<void> showEditPerusahaanPopup(
                           ),
                           const SizedBox(width: 10),
                           if (fileName != null)
-                            Text(fileName!,
-                                style: GoogleFonts.poppins(fontSize: 12)),
+                            Expanded(
+                              child: Text(fileName!,
+                                  style: GoogleFonts.poppins(fontSize: 12)),
+                            ),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -304,7 +336,7 @@ Future<void> showEditPerusahaanPopup(
                                   fileBytes != null) {
                                 onSubmit({
                                   "user_id": selectedUserId,
-                                  "quota": quotaController,
+                                  "quota": quotaController.text,
                                   "nama": nameController.text,
                                   "slug": nameController.text,
                                   "jam_mulai": "${selectedStartTime!.hour.toString()}:${selectedStartTime!.minute.toString()}:00",

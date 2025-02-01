@@ -1,22 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/admin/widgets/edit/show_edit_teacher.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_teacher.dart';
 import 'package:si_pkl/provider/admin/teachers_provider.dart';
+import 'package:si_pkl/provider/admin/users_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
 
-class TeachersTablePage extends StatelessWidget {
+class TeachersTablePage extends StatefulWidget {
   const TeachersTablePage({super.key});
 
+  @override
+  State<TeachersTablePage> createState() => _TeachersTablePageState();
+}
+
+class _TeachersTablePageState extends State<TeachersTablePage> {
   @override
   Widget build(BuildContext context) {
     final teacherProvider =
         Provider.of<TeachersProvider>(context, listen: false);
-
+    final userProvider = Provider.of<UsersProvider>(context, listen:false);
+    void showDeleteDialog(BuildContext context, int id) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Konfirmasi"),
+            content: const Text("Apakah Anda yakin ingin menghapus data ini?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await teacherProvider.deleteUser(id: id);
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                  teacherProvider.getTeachers();
+                },
+                child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+              )
+            ],
+          );
+        },
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
-        future: teacherProvider.getTeachers(),
+        future: Future.wait([
+          teacherProvider.getTeachers(),
+          userProvider.getUsers(),
+        ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -28,7 +65,7 @@ class TeachersTablePage extends StatelessWidget {
               ),
             );
           }
-          final teachers = teacherProvider.teachersModel?.teachers?.toList();
+          final users = userProvider.usersModel?.user?.toList() ?? [];
           return Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -50,12 +87,16 @@ class TeachersTablePage extends StatelessWidget {
                     GestureDetector(
                       onTap: () async{
                         await showTambahTeacherPopup(
-                          teachers: teachers, 
+                          user: users,
                           context: context, 
-                          onSubmit:(data, fileBytes, fileName) {
-                            teacherProvider.addTeacher(data: data, fileBytes: fileBytes, filePath: fileName, fileName: fileName);
-                          },
-                          );
+                          onSubmit:(data, fileBytes, fileName) async{
+                            await teacherProvider.addTeacher(data: data, fileBytes: fileBytes, filePath: fileName, fileName: fileName).then((value){
+                              teacherProvider.getTeachers();
+                              setState(() {});
+                            });
+                          });
+                        await teacherProvider.getTeachers();
+                        setState(() {});
                       },
                       child: Icon(
                         Icons.person_add_alt_1,
@@ -219,6 +260,11 @@ class TeachersTablePage extends StatelessWidget {
                                   (index) {
                                     final teacherData = teacher[index];
                                     final nomor = index + 1;
+                                    final DateTime dateLahir = DateTime.parse(
+                                        teacherData.tanggalLahir!);
+                                    String tanggalLahir = DateFormat(
+                                            'EEEE, dd MMMM yyyy', 'id_ID')
+                                        .format(dateLahir);
                                     return DataRow(
                                       cells: <DataCell>[
                                         DataCell(Text(nomor.toString())),
@@ -239,7 +285,7 @@ class TeachersTablePage extends StatelessWidget {
                                         DataCell(
                                             Text(teacherData.tempatLahir ?? '-')),
                                         DataCell(
-                                            Text(teacherData.tanggalLahir ?? '-')),
+                                            Text(tanggalLahir)),
                                         DataCell(
                                             Text(teacherData.alamat ?? '-')),
                                         DataCell(
@@ -251,20 +297,21 @@ class TeachersTablePage extends StatelessWidget {
                                             children: [
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  final userModel =
+                                                      users.firstWhere((u) =>
+                                                          u.id ==
+                                                          teacherData.userId);
+                                                  final id = teacherData.id;
+                                                  final teachers = teacher.firstWhere((t)=> t.id == teacherData.id);  
+                                                  showEditTeacherPopup(teachers: teachers, user: userModel, context: context, onSubmit: (data, fileByte, fileNeme) async{
+                                                    await teacherProvider.editTeacher(id: id!, data: data, fileBytes: fileByte).then((value){
+                                                      teacherProvider.getTeachers();
+                                                      setState(() {});
+                                                    });
+                                                  });
+                                                  await teacherProvider
+                                                      .getTeachers();
+                                                  setState(() {});
                                                 },
                                                 child: Container(
                                                   margin:
@@ -289,20 +336,7 @@ class TeachersTablePage extends StatelessWidget {
                                               ),
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  showDeleteDialog(context, teacherData.id!);
                                                 },
                                                 child: Container(
                                                   margin:

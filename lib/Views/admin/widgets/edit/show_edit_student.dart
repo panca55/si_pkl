@@ -264,6 +264,10 @@ Future<void> showEditStudentPopup(
                         readOnly: true,
                         controller: tanggalLahirController,
                         decoration: const InputDecoration(
+                          suffixIcon: Icon(
+                            Icons.calendar_month,
+                            color: Colors.black,
+                          ),
                           floatingLabelBehavior: FloatingLabelBehavior.auto,
                           labelText: "Tanggal Lahir",
                           border: OutlineInputBorder(),

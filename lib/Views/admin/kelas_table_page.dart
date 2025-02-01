@@ -1,19 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/admin/widgets/edit/show_edit_kelas.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_kelas.dart';
 import 'package:si_pkl/provider/admin/departments_provider.dart';
 import 'package:si_pkl/provider/admin/mayors_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
 
-class KelasTablePage extends StatelessWidget {
+class KelasTablePage extends StatefulWidget {
   const KelasTablePage({super.key});
 
+  @override
+  State<KelasTablePage> createState() => _KelasTablePageState();
+}
+
+class _KelasTablePageState extends State<KelasTablePage> {
   @override
   Widget build(BuildContext context) {
     final mayorsProvider =
         Provider.of<MayorsProvider>(context, listen: false);
     final departmentsProvider = Provider.of<DepartmentsProvider>(context, listen:false);
+    void showDeleteDialog(BuildContext context, int id) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Konfirmasi"),
+            content: const Text("Apakah Anda yakin ingin menghapus data ini?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await mayorsProvider.deleteUser(id: id);
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                  mayorsProvider.getMayors();
+                },
+                child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+              )
+            ],
+          );
+        },
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
@@ -52,10 +84,15 @@ class KelasTablePage extends StatelessWidget {
                       width: 10,
                     ),
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async{
                         showTambahKelasPopup(department: department, context: context, onSubmit: (data)async{
-                          await mayorsProvider.addMayor(data: data);
+                          await mayorsProvider.addMayor(data: data).then((value){
+                            mayorsProvider.getMayors();
+                            setState(() {});
+                          });
                         });
+                        await mayorsProvider.getMayors();
+                        setState(() {});
                       },
                       child: Icon(
                         Icons.person_add_alt_1,
@@ -152,20 +189,16 @@ class KelasTablePage extends StatelessWidget {
                                             children: [
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  final mayor = kelas.firstWhere((k)=> k.id == kelasData.id);
+                                                  final id = kelasData.id;
+                                                  showEditKelasPopup(department: department, mayor: mayor, context: context, onSubmit: (data)async{
+                                                    mayorsProvider.editKelas(id:id! , data: data).then((value){
+                                                    mayorsProvider.getMayors();
+                                                    setState(() {});
+                                                    });
+                                                  });
+                                                  await mayorsProvider.getMayors();
+                                                  setState(() {});
                                                 },
                                                 child: Container(
                                                   margin:
@@ -190,20 +223,7 @@ class KelasTablePage extends StatelessWidget {
                                               ),
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  showDeleteDialog(context, kelasData.id!);
                                                 },
                                                 child: Container(
                                                   margin:

@@ -1,7 +1,7 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
@@ -9,7 +9,6 @@ import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/guru/evaluation_model.dart';
 import 'dart:html' as html;
-import 'package:pdf/widgets.dart' as pw;
 
 class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
   EvaluationModel? _evaluationModel;
@@ -23,13 +22,11 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
   EvaluationGuruProvider({required this.authController});
 
   Future<void> getEvaluationSiswa() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '340|PtK7ZVsJUxGaO9i0e96koACk8m07CqZ1eMm4aqg496e10889';
-
-    // if (tokenUser == null) {
-    //   debugPrint('Auth token is null. Please log in again.');
-    //   return;
-    // }
+    final tokenUser = authController.authToken;
+    if (tokenUser == null) {
+      debugPrint('Auth token is null. Please log in again.');
+      return;
+    }
     try {
       http.Response response = await http.get(
         super.evaluationPath,
@@ -49,13 +46,12 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
     }
   }
   Future<void> getPrintEvaluation(int id) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '340|PtK7ZVsJUxGaO9i0e96koACk8m07CqZ1eMm4aqg496e10889';
+    final tokenUser = authController.authToken;
 
-    // if (tokenUser == null) {
-    //   debugPrint('Auth token is null. Please log in again.');
-    //   return;
-    // }
+    if (tokenUser == null) {
+      debugPrint('Auth token is null. Please log in again.');
+      return;
+    }
     try {
       http.Response response = await http.get(
         super.printEvaluationPath(id),
@@ -96,7 +92,7 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
   }
   
   Future<Uint8List?> getShowEvaluation(int id) async {
-    const tokenUser = '340|PtK7ZVsJUxGaO9i0e96koACk8m07CqZ1eMm4aqg496e10889';
+    final tokenUser = authController.authToken;
 
     try {
       http.Response response = await http.get(
@@ -131,8 +127,7 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
     required int logbook,
     required int presentasi,
   }) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '340|PtK7ZVsJUxGaO9i0e96koACk8m07CqZ1eMm4aqg496e10889';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.evaluationPath;
       final requestBody = {

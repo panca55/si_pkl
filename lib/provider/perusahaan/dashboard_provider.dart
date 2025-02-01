@@ -12,8 +12,7 @@ class DashboardProvider extends BaseApi with ChangeNotifier {
   DashboardProvider({required this.authController});
 
   Future<void> getDashboardData() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '53|dCDZlC9eycak7o5HRqzOBnIaBXuLAx5eJyHJwfSPec286224';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
@@ -44,8 +43,7 @@ class DashboardProvider extends BaseApi with ChangeNotifier {
     required int studentId,
     required int instructorId,
   }) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '53|dCDZlC9eycak7o5HRqzOBnIaBXuLAx5eJyHJwfSPec286224';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.postSubmitInstrukturPath;
       final requestBody = {

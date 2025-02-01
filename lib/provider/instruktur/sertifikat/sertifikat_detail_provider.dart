@@ -1,13 +1,12 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/instruktur/sertifikat/sertifikat_detail_model.dart';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
 class SertifikatDetailProvider extends BaseApi with ChangeNotifier {
@@ -19,8 +18,7 @@ class SertifikatDetailProvider extends BaseApi with ChangeNotifier {
 
   Uint8List? get pdfData => _pdfData;
   Future<void> getBimbingan(int id) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
@@ -52,13 +50,12 @@ class SertifikatDetailProvider extends BaseApi with ChangeNotifier {
     }
   }
   Future<void> getPrintSertifikat(int id) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
 
-    // if (tokenUser == null) {
-    //   debugPrint('Auth token is null. Please log in again.');
-    //   return;
-    // }
+    if (tokenUser == null) {
+      debugPrint('Auth token is null. Please log in again.');
+      return;
+    }
     try {
       http.Response response = await http.get(
         super.printSertifikatPath(id),

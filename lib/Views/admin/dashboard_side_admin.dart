@@ -136,7 +136,11 @@ class _DashboardSideAdminState extends State<DashboardSideAdmin> {
                               (Route<dynamic> route) => false,
                             );
                           },
-                          child: const Text('Logout'),
+                          child: Text('Logout',
+                            style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ],
                     );

@@ -10,6 +10,7 @@ import 'package:si_pkl/Views/siswa/logbook.dart';
 import 'package:si_pkl/Views/siswa/pkl.dart';
 import 'package:si_pkl/Views/siswa/profile.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
+import 'package:si_pkl/provider/siswa/profile_provider.dart';
 
 class DashboardSide extends StatefulWidget {
   const DashboardSide({super.key});
@@ -33,6 +34,12 @@ class _DashboardSideState extends State<DashboardSide> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthController>(context);
+    final profileProvider = Provider.of<ProfileProvider>(context);
+    profileProvider.getProfileSiswa();
+    if(profileProvider.currentSiswa?.nama == '' && profileProvider.currentSiswa?.hpSiswa == '' && profileProvider.currentSiswa?.nama == null &&
+        profileProvider.currentSiswa?.hpSiswa == null){
+      _currentPage = 'Profile';
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

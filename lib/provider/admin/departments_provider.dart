@@ -12,10 +12,38 @@ class DepartmentsProvider extends BaseApi with ChangeNotifier {
   List<Department>? get listDepartment => _listDepartment;
   final AuthController authController;
   DepartmentsProvider({required this.authController});
+  Future<void> deleteUser({
+    required int id,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.deleteDepartmentPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
 
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Berhasil menghapus data user:');
+        _listDepartment.removeWhere((user) => user.id == id);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal menghapus data user:: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error menghapus data user:: $e');
+    }
+  }
   Future<void> getDepartments() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
@@ -48,8 +76,7 @@ class DepartmentsProvider extends BaseApi with ChangeNotifier {
   Future<void> addDepartment({
     required String nama,
   }) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.addDepartmentPath;
       final requestBody = {"nama": nama};
@@ -82,6 +109,45 @@ class DepartmentsProvider extends BaseApi with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error addDepartment: $e');
+    }
+  }
+  Future<void> editDepartment({
+    required int id,
+    required String data,
+    String? fileName,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final requestBody = {"nama": data};
+      final uri = super.editDepartmentPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.put(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestBody), // Kirim data sebagai JSON
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+      final responseBody = response.body;
+      debugPrint('Response Body: $responseBody');
+      debugPrint('Data sebelum dikirim: ${jsonEncode(requestBody)}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = json.decode(responseBody);
+        debugPrint('Berhasil edit data siswa');
+        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+        _departmentsModel = DepartmentsModel.fromJson(responseData);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error edit data siswa: $e');
     }
   }
 }

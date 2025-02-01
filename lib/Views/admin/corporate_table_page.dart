@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/admin/widgets/edit/show_edit_corporate.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_corporate.dart';
 import 'package:si_pkl/provider/admin/corporations_provider.dart';
 import 'package:si_pkl/provider/admin/users_provider.dart';
@@ -18,6 +19,32 @@ class _CorporateTablePageState extends State<CorporateTablePage> {
   Widget build(BuildContext context) {
     final corporatesProvider = Provider.of<CorporationsProvider>(context, listen: false);
     final userProvider = Provider.of<UsersProvider>(context, listen: false);
+    void showDeleteDialog(BuildContext context, int id) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Konfirmasi"),
+            content: const Text("Apakah Anda yakin ingin menghapus data ini?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await corporatesProvider.deleteUser(id: id);
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                  corporatesProvider.getCorporations();
+                },
+                child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+              )
+            ],
+          );
+        },
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
@@ -237,20 +264,25 @@ class _CorporateTablePageState extends State<CorporateTablePage> {
                                             children: [
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  final userModel =
+                                                      user?.firstWhere(
+                                                          (u) =>
+                                                              u.id ==
+                                                              corporateData.userId);
+                                                  final perusahaan =
+                                                      corporate.firstWhere(
+                                                          (u) =>
+                                                              u.id ==
+                                                              corporateData.id);
+                                                  final id = corporateData.id;
+                                                  showEditPerusahaanPopup(user: userModel, perusahaan: perusahaan, context: context, onSubmit: (data,fileByte, fileName)async{
+                                                    await corporatesProvider.editCorporate(id: id!, data: data, fileBytes: fileByte, fileName: fileName).then((value){
+                                                      corporatesProvider.getCorporations();
+                                                      setState(() {});
+                                                    });
+                                                  });
+                                                  await corporatesProvider.getCorporations();
+                                                  setState(() {});
                                                 },
                                                 child: Container(
                                                   margin:
@@ -275,20 +307,7 @@ class _CorporateTablePageState extends State<CorporateTablePage> {
                                               ),
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  showDeleteDialog(context, corporateData.id!);
                                                 },
                                                 child: Container(
                                                   margin:

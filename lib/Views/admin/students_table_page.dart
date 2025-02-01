@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/admin/widgets/edit/show_edit_student.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_student.dart';
@@ -21,7 +22,32 @@ class _StudentsTablePageState extends State<StudentsTablePage> {
     final studentsProvider = Provider.of<StudentsProvider>(context, listen: false);
     final userProvider = Provider.of<UsersProvider>(context, listen: false);
     final mayorProvider = Provider.of<MayorsProvider>(context, listen: false);
-
+    void showDeleteDialog(BuildContext context, int id) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Konfirmasi"),
+            content: const Text("Apakah Anda yakin ingin menghapus data ini?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await studentsProvider.deleteUser(id: id);
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                  studentsProvider.getStudents();
+                },
+                child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+              )
+            ],
+          );
+        },
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
@@ -254,6 +280,11 @@ class _StudentsTablePageState extends State<StudentsTablePage> {
                         
                                     final studentData = student[index];
                                     final nomor = index + 1;
+                                    final DateTime dateLahir = DateTime.parse(
+                                        studentData.tanggalLahir!);
+                                    String tanggalLahir = DateFormat(
+                                            'EEEE, dd MMMM yyyy', 'id_ID')
+                                        .format(dateLahir);
                                     return DataRow(
                                       cells: <DataCell>[
                                         DataCell(Text(nomor.toString())),
@@ -266,7 +297,7 @@ class _StudentsTablePageState extends State<StudentsTablePage> {
                                         DataCell(Text(studentData.tahunMasuk ?? '-')),
                                         DataCell(Text(studentData.jenisKelamin ?? '-')),
                                         DataCell(Text(studentData.tempatLahir ?? '-')),
-                                        DataCell(Text(studentData.tanggalLahir ?? '-')),
+                                        DataCell(Text(tanggalLahir)),
                                         DataCell(Text(studentData.alamatSiswa ?? '-')),
                                         DataCell(Text(studentData.alamatOrtu ?? '-')),
                                         DataCell(Text(studentData.hpSiswa ?? '-')),
@@ -323,20 +354,7 @@ class _StudentsTablePageState extends State<StudentsTablePage> {
                                               ),
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  showDeleteDialog(context, studentData.id!);
                                                 },
                                                 child: Container(
                                                   margin:
@@ -380,3 +398,4 @@ class _StudentsTablePageState extends State<StudentsTablePage> {
     );
   }
 }
+

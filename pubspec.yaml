@@ -54,6 +54,7 @@ dependencies:
   pdf: ^3.11.1
   html: ^0.15.5
   pdfx: ^2.8.0
+  flutter_native_splash: ^2.4.4
 
 
 dependency_overrides:

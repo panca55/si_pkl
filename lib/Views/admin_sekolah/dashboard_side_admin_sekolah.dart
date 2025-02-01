@@ -139,7 +139,11 @@ class _DashboardSideAdminSekolahState extends State<DashboardSideAdminSekolah> {
                               (Route<dynamic> route) => false,
                             );
                           },
-                          child: const Text('Logout'),
+                          child: Text('Logout',
+                            style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ],
                     );

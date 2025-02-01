@@ -12,8 +12,7 @@ class SertifikatProvider extends BaseApi with ChangeNotifier {
   SertifikatProvider({required this.authController});
 
   Future<void> getBimbingan() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
@@ -49,8 +48,7 @@ class SertifikatProvider extends BaseApi with ChangeNotifier {
   }
   Future<void> submitSertifikat(
       {required Map<String, dynamic> formData}) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.postSertifikatPath;
       final requestBody = formData;

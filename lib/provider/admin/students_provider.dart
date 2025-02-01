@@ -10,12 +10,43 @@ import 'package:universal_io/io.dart' as universal_io;
 class StudentsProvider extends BaseApi with ChangeNotifier {
   StudentsModel? _studentsModel;
   StudentsModel? get studentsModel => _studentsModel;
+  final List<Student> _students = [];
+  List<Student> get students => _students;
   final AuthController authController;
   StudentsProvider({required this.authController});
 
+  Future<void> deleteUser({
+    required int id,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.editStudentPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Berhasil menghapus data user:');
+        _students.removeWhere((user) => user.id == id);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal menghapus data user:: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error menghapus data user:: $e');
+    }
+  }
   Future<void> getStudents() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
@@ -47,8 +78,7 @@ class StudentsProvider extends BaseApi with ChangeNotifier {
       required Uint8List? fileBytes,
       String? filePath,
       String? fileName}) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.addStudentPath;
       final request = http.MultipartRequest('POST', uri)
@@ -111,7 +141,7 @@ class StudentsProvider extends BaseApi with ChangeNotifier {
     required Uint8List? fileBytes,
     String? fileName,
   }) async {
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.editStudentPath(id);
 

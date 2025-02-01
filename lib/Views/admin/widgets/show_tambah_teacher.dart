@@ -3,12 +3,14 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:si_pkl/models/admin/teachers_model.dart';
+import 'package:si_pkl/models/admin/users_model.dart' as user;
 
 Future<void> showTambahTeacherPopup(
-    {required List<Teacher>? teachers,
+    {required List<user.User>? user,
     required BuildContext context,
-    required Function(Map<String, dynamic> data, Uint8List fileBytes, String? fileName) onSubmit}) async {
+    required Function(
+            Map<String, dynamic> data, Uint8List fileBytes, String? fileName)
+        onSubmit}) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController nipController = TextEditingController();
@@ -21,7 +23,7 @@ Future<void> showTambahTeacherPopup(
   final TextEditingController noHpController = TextEditingController();
   String? selectedJenisKelamin;
   String? selectedGolongan;
-  final users = teachers?.toList() ?? [];
+  final users = user?.where((u) => u.role == "GURU").toList() ?? [];
   int? selectedUserId;
   DateTime? selectedDate;
   Uint8List? fileBytes;
@@ -96,9 +98,9 @@ Future<void> showTambahTeacherPopup(
                           border: OutlineInputBorder(),
                         ),
                         items: users
-                            .map((teacher) => DropdownMenuItem<int>(
-                                  value: teacher.userId,
-                                  child: Text(teacher.user?.name ?? ''),
+                            .map((user) => DropdownMenuItem<int>(
+                                  value: user.id,
+                                  child: Text(user.name ?? ''),
                                 ))
                             .toList(),
                         value: selectedUserId,
@@ -260,6 +262,10 @@ Future<void> showTambahTeacherPopup(
                       TextFormField(
                         readOnly: true,
                         decoration: InputDecoration(
+                          suffixIcon: const Icon(
+                            Icons.calendar_month,
+                            color: Colors.black,
+                          ),
                           floatingLabelBehavior: FloatingLabelBehavior.never,
                           labelText: selectedDate != null
                               ? selectedDate!.toLocal().toString().split(' ')[0]
@@ -346,12 +352,21 @@ Future<void> showTambahTeacherPopup(
                                   selectedDate != null &&
                                   fileBytes != null) {
                                 onSubmit({
-                                  "user_id": selectedUserId, 
-                                  "nip": nipController.text, 
-                                  "nama": nameController.text, 
-                                  "golongan" : selectedGolongan, 
-                                  "bidang_studi" : bidangStudiController.text, "pendidikan_terakhir" : pendidikanTerakhirController.text, "jabatan": jabatanController.text, "jenis_kelamin":selectedJenisKelamin, "tanggal_lahir": selectedDate?.toIso8601String(), "tempat_lahir": tempatLahirController.text, "alamat":alamatController.text, "hp":noHpController.text, 
-                                },fileBytes!, fileName);
+                                  "user_id": selectedUserId,
+                                  "nip": nipController.text,
+                                  "nama": nameController.text,
+                                  "golongan": selectedGolongan,
+                                  "bidang_studi": bidangStudiController.text,
+                                  "pendidikan_terakhir":
+                                      pendidikanTerakhirController.text,
+                                  "jabatan": jabatanController.text,
+                                  "jenis_kelamin": selectedJenisKelamin,
+                                  "tanggal_lahir":
+                                      selectedDate?.toIso8601String(),
+                                  "tempat_lahir": tempatLahirController.text,
+                                  "alamat": alamatController.text,
+                                  "hp": noHpController.text,
+                                }, fileBytes!, fileName);
                                 Navigator.of(context).pop();
                               }
                             },

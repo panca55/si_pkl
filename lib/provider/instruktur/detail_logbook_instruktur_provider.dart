@@ -12,8 +12,7 @@ class DetailLogbookInstrukturProvider extends BaseApi with ChangeNotifier {
   DetailLogbookInstrukturProvider({required this.authController});
 
   Future<void> getIndexLogbook(int id) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
       return;
@@ -42,8 +41,7 @@ class DetailLogbookInstrukturProvider extends BaseApi with ChangeNotifier {
       required String noteType,
       required String catatan,
       required String penilaian}) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.postKomentarInstrukturPath;
       final requestBody = {
@@ -83,8 +81,7 @@ class DetailLogbookInstrukturProvider extends BaseApi with ChangeNotifier {
       {required int id,
       required String catatan,
       required String penilaian}) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.editKomentarInstrukturPath(id);
       final requestBody = {

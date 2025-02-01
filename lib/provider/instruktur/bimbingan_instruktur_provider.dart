@@ -12,8 +12,7 @@ class BimbinganInstrukturProvider extends BaseApi with ChangeNotifier {
   BimbinganInstrukturProvider({required this.authController});
 
   Future<void> getBimbingan() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');

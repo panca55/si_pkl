@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 Future<void> showTambahInfoPopup(
     {
@@ -11,12 +10,9 @@ Future<void> showTambahInfoPopup(
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController isiController = TextEditingController();
+  
   DateTime? tanggalMulai;
   DateTime? tanggalBerakhir;
-  String dateMulai =
-      DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(tanggalMulai!);
-  String dateAkhir =
-      DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(tanggalBerakhir!);
   Future<void> pickDate(BuildContext context, {bool isMulai = true}) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -80,6 +76,8 @@ Future<void> showTambahInfoPopup(
                           return null;
                         },
                       ),
+                      const SizedBox(height: 10),
+
                       TextFormField(
                         readOnly: true,
                         decoration: InputDecoration(
@@ -94,6 +92,7 @@ Future<void> showTambahInfoPopup(
                           setState(() {});
                         },
                       ),
+                      const SizedBox(height: 10),
                       TextFormField(
                         readOnly: true,
                         decoration: InputDecoration(
@@ -125,8 +124,8 @@ Future<void> showTambahInfoPopup(
                                 onSubmit({
                                   "nama": nameController.text,
                                   "isi": isiController.text,
-                                  "tanggal_mulai": dateMulai,
-                                  "tanggal_berakhir": dateAkhir,
+                                  "tanggal_mulai": tanggalMulai?.toIso8601String(),
+                                  "tanggal_berakhir": tanggalBerakhir?.toIso8601String(),
                                 });
                                 Navigator.of(context).pop();
                               }

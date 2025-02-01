@@ -13,13 +13,11 @@ class BimbinganInstrukturIndexProvider extends BaseApi with ChangeNotifier {
 
 
   Future<void> getIndexBimbingan(int id) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '501|OzL9PoHIs30Npe6CfbJGHvgIyciA2BNgNRr47Ck712239be1';
-
-    // if (tokenUser == null) {
-    //   debugPrint('Auth token is null. Please log in again.');
-    //   return;
-    // }
+    final tokenUser = authController.authToken;
+    if (tokenUser == null) {
+      debugPrint('Auth token is null. Please log in again.');
+      return;
+    }
     try {
       http.Response response = await http.get(
         super.bimbinganInstrukturIndexPath(id),

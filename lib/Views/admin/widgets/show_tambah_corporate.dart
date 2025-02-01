@@ -18,7 +18,7 @@ Future<void> showTambahPerusahaanPopup(
   final TextEditingController noHpController = TextEditingController();
   String? mulaiHariKerja;
   String? akhirHariKerja;
-  final corporate = user?.toList() ?? [];
+  final corporate = user?.where((u) => u.role == "PERUSAHAAN").toList() ?? [];
   int? selectedUserId;
   Uint8List? fileBytes;
   String? fileName;
@@ -205,6 +205,10 @@ Future<void> showTambahPerusahaanPopup(
                             child: TextFormField(
                               readOnly: true,
                               decoration: InputDecoration(
+                                suffixIcon: const Icon(
+                                  Icons.access_time_outlined,
+                                  color: Colors.black,
+                                ),
                                 labelText: selectedStartTime != null
                                     ? selectedStartTime!.format(context)
                                     : "Pilih Waktu Mulai",
@@ -221,6 +225,10 @@ Future<void> showTambahPerusahaanPopup(
                             child: TextFormField(
                               readOnly: true,
                               decoration: InputDecoration(
+                                suffixIcon: const Icon(
+                                  Icons.access_time_outlined,
+                                  color: Colors.black,
+                                ),
                                 labelText: selectedEndTime != null
                                     ? selectedEndTime!.format(context)
                                     : "Pilih Waktu Selesai",

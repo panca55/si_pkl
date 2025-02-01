@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/admin/widgets/edit/show_edit_user.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_user_popup.dart';
 import 'package:si_pkl/provider/admin/users_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
 
-class UsersTablePage extends StatelessWidget {
+class UsersTablePage extends StatefulWidget {
   const UsersTablePage({super.key});
+
+  @override
+  State<UsersTablePage> createState() => _UsersTablePageState();
+}
+
+class _UsersTablePageState extends State<UsersTablePage> {
+  int _rowsPerPage = 5; // Jumlah baris per halaman
+  String? _selectedRole;
 
   @override
   Widget build(BuildContext context) {
@@ -42,260 +51,92 @@ class UsersTablePage extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                    const SizedBox(width: 10),
                     GestureDetector(
                       onTap: () async {
                         await showTambahUserPopup(
                           context: context,
                           onSubmit: (data) {
-                            usersProvider.addUser(data: data);
+                            usersProvider.addUser(data: data).then((value) {
+                              usersProvider.getUsers();
+                              setState(() {});
+                            });
                           },
                         );
+                        await usersProvider.getUsers();
+                        setState(() {});
                       },
                       child: Icon(
                         Icons.person_add_alt_1,
                         color: Colors.indigo.shade700,
                       ),
-                    )
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          decoration: const InputDecoration(
+                            labelText: "ROLE",
+                            border: OutlineInputBorder(),
+                          ),
+                          items: ['ADMIN', 'SISWA', 'GURU', 'PERUSAHAAN', 'INSTRUKTUR', 'WAKAHUMAS', 'WAKAKURIKULUM','KEPSEK', 'WAKASEK', 'DAPODIK']
+                              .map((item) => DropdownMenuItem(
+                                    value: item,
+                                    child: Text(item),
+                                  ))
+                              .toList(),
+                          value: _selectedRole,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedRole = value;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Penilaian harus dipilih';
+                            }
+                            return null;
+                          },
+                        ),
+                    ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Consumer<UsersProvider?>(
                   builder: (context, provider, child) {
-                    final user = provider?.usersModel?.user ?? [];
+                    final userRole = provider?.usersModel?.user?.where((u)=> u.role == _selectedRole)
+                        .toList() ?? []; 
+                    final user = _selectedRole == null ? provider?.usersModel?.user ?? [] : userRole;
                     if (user.isEmpty) {
                       return const Center(
                         child: Text(
                           'Belum ada data users',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                              fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       );
                     } else {
                       return Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.25),
-                                offset: const Offset(1, 1),
-                              ),
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.25),
-                                offset: const Offset(-1, -1),
-                              ),
+                        child: SingleChildScrollView(
+                          child: PaginatedDataTable(
+                            columns: <DataColumn>[
+                              DataColumn(label: Text("No".toUpperCase())),
+                              DataColumn(
+                                  label: Text("User Name".toUpperCase())),
+                              DataColumn(label: Text("Email".toUpperCase())),
+                              DataColumn(label: Text("Role".toUpperCase())),
+                              DataColumn(label: Text("Status".toUpperCase())),
+                              DataColumn(label: Text("Aksi".toUpperCase())),
                             ],
-                          ),
-                          child: SingleChildScrollView(
-                            child: SingleChildScrollView(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5),
-                              scrollDirection: Axis.horizontal,
-                              child: DataTable(
-                                clipBehavior: Clip.hardEdge,
-                                dataRowMinHeight: 45,
-                                horizontalMargin: 30,
-                                columns: <DataColumn>[
-                                  DataColumn(
-                                    label: Text(
-                                      "No".toUpperCase(),
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      "User Name".toUpperCase(),
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      "Email".toUpperCase(),
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      "Role".toUpperCase(),
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      "Status".toUpperCase(),
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      "aksi".toUpperCase(),
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black),
-                                    ),
-                                  ),
-                                ],
-                                rows: List<DataRow>.generate(
-                                  user.length,
-                                  (index) {
-                                    final userData = user[index];
-                                    final nomor = index + 1;
-                                    return DataRow(
-                                      cells: <DataCell>[
-                                        DataCell(Text(nomor.toString())),
-                                        DataCell(Text(userData.name ?? '-')),
-                                        DataCell(Text(userData.email ?? '-')),
-                                        DataCell(Text(userData.role ?? '-')),
-                                        DataCell(Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: userData.isActive == 1
-                                                    ? GlobalColorTheme
-                                                        .successColor
-                                                    : GlobalColorTheme
-                                                        .errorColor),
-                                            child: Text(
-                                              userData.isActive == 1
-                                                  ? 'Aktif'.toUpperCase()
-                                                  : 'Tidak Aktif'.toUpperCase(),
-                                              style: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white),
-                                            ))),
-                                        DataCell(
-                                          Row(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
-                                                },
-                                                child: Container(
-                                                  margin: const EdgeInsets
-                                                      .symmetric(
-                                                      vertical: 5,
-                                                      horizontal: 5),
-                                                  padding:
-                                                      const EdgeInsets.all(8),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        Colors.indigo.shade700,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.edit_document,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  await context
-                                                      .read<
-                                                          UsersProvider>()
-                                                      .toggleActive(
-                                                          userId: userData.id!);
-                                                },
-                                                child: Container(
-                                                  margin: const EdgeInsets
-                                                      .symmetric(
-                                                      vertical: 5,
-                                                      horizontal: 5),
-                                                  padding:
-                                                      const EdgeInsets.all(8),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.red.shade900,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons
-                                                        .power_settings_new_sharp,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
-                                                },
-                                                child: Container(
-                                                  margin: const EdgeInsets
-                                                      .symmetric(
-                                                      vertical: 5,
-                                                      horizontal: 5),
-                                                  padding:
-                                                      const EdgeInsets.all(8),
-                                                  decoration: BoxDecoration(
-                                                    color: GlobalColorTheme
-                                                        .errorColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.delete,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
+                            source: _UserDataTableSource(
+                                user, context, usersProvider),
+                            rowsPerPage: _rowsPerPage,
+                            availableRowsPerPage: const [5, 10, 20],
+                            onRowsPerPageChanged: (value) {
+                              setState(() {
+                                _rowsPerPage = value ?? 5;
+                              });
+                            },
                           ),
                         ),
                       );
@@ -309,4 +150,113 @@ class UsersTablePage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _UserDataTableSource extends DataTableSource {
+  final List user;
+  final BuildContext context;
+  final UsersProvider usersProvider;
+
+  void _showDeleteDialog(BuildContext context, int id) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Konfirmasi"),
+          content: const Text("Apakah Anda yakin ingin menghapus data ini?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            TextButton(
+                  onPressed: () async {
+                          await usersProvider.deleteUser(id: id);
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                          usersProvider.getUsers();
+                        },
+                  child:  const Text("Hapus",
+                          style: TextStyle(color: Colors.red)),
+                )
+          ],
+        );
+      },
+    );
+  }
+  _UserDataTableSource(this.user, this.context, this.usersProvider);
+
+  @override
+  DataRow? getRow(int index) {
+    if (index >= user.length) return null;
+    final userData = user[index];
+    final nomor = index + 1;
+    return DataRow(
+        color: const WidgetStatePropertyAll(Colors.white),
+        cells: <DataCell>[
+          DataCell(Text(nomor.toString())),
+          DataCell(Text(userData.name ?? '-')),
+          DataCell(Text(userData.email ?? '-')),
+          DataCell(Text(userData.role ?? '-')),
+          DataCell(
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: userData.isActive == 1
+                    ? GlobalColorTheme.successColor
+                    : GlobalColorTheme.errorColor,
+              ),
+              child: Text(
+                userData.isActive == 1
+                    ? 'Aktif'.toUpperCase()
+                    : 'Tidak Aktif'.toUpperCase(),
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ),
+          ),
+          DataCell(
+            Row(children: [
+              GestureDetector(
+                onTap: () async {
+                  showEditUserPopup(
+                    context: context,
+                    user: userData,
+                    onSubmit: (data) async {
+                      await usersProvider.editUser(
+                          id: userData.id!, data: data);
+                      usersProvider.getUsers();
+                    },
+                  );
+                },
+                child: const Icon(Icons.edit, color: Colors.blue),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () async {
+                  await usersProvider.toggleActive(userId: userData.id!);
+                },
+                child: const Icon(Icons.power_settings_new, color: Colors.red),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () async {
+                  _showDeleteDialog(context, userData.id);
+                },
+                child: const Icon(Icons.delete, color: Colors.red),
+              ),
+            ]),
+          ),
+        ]);
+  }
+
+  @override
+  int get rowCount => user.length;
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get selectedRowCount => 0;
 }

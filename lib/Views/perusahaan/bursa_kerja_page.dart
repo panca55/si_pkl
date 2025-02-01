@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:si_pkl/Views/instruktur/bimbingan/bimbingan_detail.dart';
 import 'package:si_pkl/models/perusahaan/bursa_kerja_model.dart';
 import 'package:si_pkl/provider/perusahaan/bursa_kerja_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
@@ -40,8 +39,9 @@ class _BursaKerjaPageState extends State<BursaKerjaPage> {
           loading = false;
           final bursaKerja =
               bursaKerjaProvider.bursaKerjaModel?.jobs?.toList() ?? [];
-          if (bursaKerjaProvider.bursaKerjaModel == null)
+          if (bursaKerjaProvider.bursaKerjaModel == null) {
             return const SizedBox.shrink();
+          }
           return Padding(
             padding: const EdgeInsets.all(10),
             child: Skeletonizer(

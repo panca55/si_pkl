@@ -8,12 +8,13 @@ import 'package:si_pkl/models/admin/users_model.dart';
 class UsersProvider extends BaseApi with ChangeNotifier {
   UsersModel? _usersModel;
   UsersModel? get usersModel => _usersModel;
+  final List<User> _user = [];
+  List<User> get user => _user;
   final AuthController authController;
   UsersProvider({required this.authController});
 
   Future<void> getUsers() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
@@ -43,8 +44,7 @@ class UsersProvider extends BaseApi with ChangeNotifier {
   Future<void> addUser({
     required Map<String, dynamic> data,
   }) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.addUserPath;
       final requestBody = data;
@@ -76,7 +76,7 @@ class UsersProvider extends BaseApi with ChangeNotifier {
   Future<void> toggleActive({
     required int userId,
   }) async {
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.toggleActivePath;
       final requestBody = {
@@ -90,11 +90,9 @@ class UsersProvider extends BaseApi with ChangeNotifier {
         ..body = jsonEncode(requestBody);
       debugPrint('Request Body: ${jsonEncode(requestBody)}');
       final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('Berhasil mengubah status aktif');
-        final responseData = json.decode(responseBody);
 
         // Cari user dalam model dan perbarui status
         if (_usersModel != null) {
@@ -116,4 +114,71 @@ class UsersProvider extends BaseApi with ChangeNotifier {
     }
   }
 
+  Future<void> editUser({
+    required int id,
+    required Map<String, dynamic> data
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.editUserPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.put(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data), // Kirim data sebagai JSON
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+      final responseBody = response.body;
+      debugPrint('Response Body: $responseBody');
+      debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = json.decode(responseBody);
+        debugPrint('Berhasil edit data siswa');
+        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+        _usersModel = UsersModel.fromJson(responseData);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error edit data siswa: $e');
+    }
+  }
+  Future<void> deleteUser({
+    required int id,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.deleteUserPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Berhasil menghapus data user:');
+        _user.removeWhere((user) => user.id == id);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal menghapus data user:: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error menghapus data user:: $e');
+    }
+  }
 }

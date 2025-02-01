@@ -9,13 +9,43 @@ import 'package:universal_io/io.dart' as universal_io;
 class InstructorsProvider extends BaseApi with ChangeNotifier {
   InstructorsModel? _instructorsModel;
   InstructorsModel? get instructorsModel => _instructorsModel;
+  final List<Instructor> _instructor =[];
+  List<Instructor> get instructoror => _instructor;
   final AuthController authController;
   InstructorsProvider({required this.authController});
+  
+  Future<void> deleteUser({
+    required int id,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.editInstrukturPath(id);
+      // Menyiapkan request dengan 'Content-Type' application/json
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
 
+      // Mengecek respon dari server
+      debugPrint('Response Status Code: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Berhasil menghapus data user:');
+        _instructor.removeWhere((user) => user.id == id);
+        notifyListeners();
+      } else {
+        debugPrint('Gagal menghapus data user:: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error menghapus data user:: $e');
+    }
+  }
   Future<void> getInstructors() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
-
+    final tokenUser = authController.authToken;
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
       return;
@@ -46,8 +76,7 @@ class InstructorsProvider extends BaseApi with ChangeNotifier {
       required Uint8List? fileBytes,
       String? filePath,
       String? fileName}) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.addInstrukturPath;
       final request = http.MultipartRequest('POST', uri)
@@ -109,7 +138,7 @@ class InstructorsProvider extends BaseApi with ChangeNotifier {
     required Uint8List? fileBytes,
     String? fileName,
   }) async {
-    const tokenUser = '296|2Pi0cH5e1fkYjZfMogujnAue733mGJeUNKuEsoG805d7cc10';
+    final tokenUser = authController.authToken;
     try {
       final uri = super.editInstrukturPath(id);
 
@@ -155,15 +184,15 @@ class InstructorsProvider extends BaseApi with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = json.decode(responseBody);
-        debugPrint('Berhasil edit data siswa');
+        debugPrint('Berhasil edit data instruktur');
         debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
         _instructorsModel = InstructorsModel.fromJson(responseData);
         notifyListeners();
       } else {
-        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+        debugPrint('Gagal edit data instruktur: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('Error edit data siswa: $e');
+      debugPrint('Error edit data instruktur: $e');
     }
   }
 }

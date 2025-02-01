@@ -13,8 +13,7 @@ class ProfilePerusahaanProvider extends BaseApi with ChangeNotifier {
   ProfilePerusahaanProvider({required this.authController});
 
   Future<void> getProfilePerusahaan() async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '53|dCDZlC9eycak7o5HRqzOBnIaBXuLAx5eJyHJwfSPec286224';
+    final tokenUser = authController.authToken;
     try {
       http.Response response = await http.get(
         super.perusahaanProfilePath,

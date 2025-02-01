@@ -249,6 +249,10 @@ Future<void> showTambahStudentPopup(
                       TextFormField(
                         readOnly: true,
                         decoration: InputDecoration(
+                          suffixIcon: const Icon(
+                            Icons.calendar_month,
+                            color: Colors.black,
+                          ),
                           floatingLabelBehavior: FloatingLabelBehavior.never,
                           labelText: selectedDate != null
                               ? selectedDate!.toLocal().toString().split(' ')[0]

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/admin/widgets/edit/show_edit_info.dart';
 import 'package:si_pkl/Views/admin/widgets/show_tambah_info.dart';
 import 'package:si_pkl/provider/admin/informations_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
@@ -18,7 +19,32 @@ class _InformationTablePageState extends State<InformationTablePage> {
   Widget build(BuildContext context) {
     final informationsProvider =
         Provider.of<InformationsProvider>(context, listen: false);
-
+    void showDeleteDialog(BuildContext context, int id) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Konfirmasi"),
+            content: const Text("Apakah Anda yakin ingin menghapus data ini?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await informationsProvider.deleteUser(id: id);
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                  informationsProvider.getInformations();
+                },
+                child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+              )
+            ],
+          );
+        },
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
@@ -202,20 +228,22 @@ class _InformationTablePageState extends State<InformationTablePage> {
                                             children: [
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
+                                                  final info = informasi.firstWhere((i)=> i.id == informasiData.id);
+                                                  final id = informasiData.id;
+                                                  showEditInfoPopup(context: context, info: info, onSubmit: (data)async{
+                                                    await informationsProvider.editInfo(id: id!, data: data)
+                                                            .then((value) {
+                                                          // Refresh data setelah popup selesai
+                                                          informationsProvider
+                                                              .getInformations();
+                                                          // Perbarui UI
+                                                          setState(() {});
+                                                        });
+                                                  });
+                                                  await informationsProvider
+                                                      .getInformations();
+                                                  // Perbarui UI
+                                                  setState(() {});
                                                 },
                                                 child: Container(
                                                   margin:
@@ -240,21 +268,8 @@ class _InformationTablePageState extends State<InformationTablePage> {
                                               ),
                                               GestureDetector(
                                                 onTap: () async {
-                                                  // final bimbinganId = bursaKerjaData
-                                                  //     .id; // Ambil ID siswa dari objek siswa
-                                                  // debugPrint('ID yang dipilih: $bimbinganId');
-                        
-                                                  // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute<void>(
-                                                  //     builder: (BuildContext context) =>
-                                                  //         BimbinganDetail(
-                                                  //       bimbinganId: bimbinganId,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
-                                                },
+                                                  showDeleteDialog(context, informasiData.id!);
+                                                  },
                                                 child: Container(
                                                   margin:
                                                       const EdgeInsets.symmetric(

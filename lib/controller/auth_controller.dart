@@ -75,10 +75,33 @@ class AuthController extends BaseApi with ChangeNotifier {
     }
   }
 
-  Future<http.Response> logout(String token) async {
-    var body = jsonEncode({'token': token});
-    http.Response response = await http.post(super.logoutPath,
-        headers: super.getHeaders(token), body: body);
-    return response;
+  Future<bool> logout(String token) async {
+  if (_token == null) {
+    debugPrint("Logout gagal: Tidak ada token yang tersimpan.");
+    return false;
   }
+
+  try {
+    http.Response response = await http.delete(
+      super.logoutPath,
+      headers: super.getHeaders(token), // Token dikirim dalam header
+    );
+
+    if (response.statusCode == 200) {
+      _token = null;
+      _currentUser = null;
+      api.setToken(''); // Hapus token dari API helper
+      notifyListeners();
+      debugPrint("Logout berhasil.");
+      return true;
+    } else {
+      debugPrint("Logout gagal: status respon (${response.statusCode}), body: ${response.body}");
+      return false;
+    }
+  } catch (e) {
+    debugPrint("Error saat logout: $e");
+    return false;
+  }
+}
+
 }

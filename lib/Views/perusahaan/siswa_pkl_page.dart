@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/pimpinan/siswa_pkl_detail.dart';
 import 'package:si_pkl/provider/perusahaan/siswa_pkl_provider.dart';
-import 'package:si_pkl/provider/pimpinan/siswa_provider.dart';
 
 class SiswaPklPage extends StatelessWidget {
   const SiswaPklPage({super.key});

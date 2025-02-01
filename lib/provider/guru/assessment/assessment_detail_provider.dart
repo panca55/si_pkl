@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/guru/assessment/assessment_detail_model.dart';
 import 'package:printing/printing.dart';
-import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
 class AssessmentDetailProvider extends BaseApi with ChangeNotifier {
