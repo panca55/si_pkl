@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/login_page.dart';
+import 'package:si_pkl/Views/siswa/create_profile.dart';
 import 'package:si_pkl/Views/siswa/dashboard.dart';
 import 'package:si_pkl/Views/siswa/evaluasi_page.dart';
 import 'package:si_pkl/Views/siswa/logbook.dart';
 import 'package:si_pkl/Views/siswa/pkl.dart';
 import 'package:si_pkl/Views/siswa/profile.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
+import 'package:si_pkl/provider/admin/mayors_provider.dart';
 import 'package:si_pkl/provider/siswa/profile_provider.dart';
 
 class DashboardSide extends StatefulWidget {
@@ -30,124 +32,180 @@ class _DashboardSideState extends State<DashboardSide> {
     'Riwayat Logbook': const Logbook(),
     'Penilaian dan Sertifikat': const EvaluasiPage(),
   };
+  Future<List<dynamic>> _fetchData() async {
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
+    final mayorProvider = Provider.of<MayorsProvider>(context, listen: false);
+
+    return Future.wait([
+      profileProvider.getProfileSiswa(),
+      mayorProvider.getMayors(),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthController>(context);
-    final profileProvider = Provider.of<ProfileProvider>(context);
-    profileProvider.getProfileSiswa();
-    if(profileProvider.currentSiswa?.nama == '' && profileProvider.currentSiswa?.hpSiswa == '' && profileProvider.currentSiswa?.nama == null &&
-        profileProvider.currentSiswa?.hpSiswa == null){
-      _currentPage = 'Profile';
-    }
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-      ),
-      drawer: Drawer(
-        backgroundColor: Colors.white,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-              decoration: const BoxDecoration(
+    return FutureBuilder(
+        future: _fetchData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: Container(
                 color: Colors.white,
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    'assets/images/SMKN2.png',
-                    width: 80,
-                    height: 80,
+                child: const Center(child: CircularProgressIndicator()),
+              ), // Tambahkan loading sementara
+            ); // Loading jika masih mengambil data
+          }
+          final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+          final mayorProvider = Provider.of<MayorsProvider>(context);
+          debugPrint(authProvider.currentUser!.token);
+          final kelasList = mayorProvider.mayorsModel?.mayor?.toList() ?? [];
+          final siswa = profileProvider.currentSiswa;
+          if ((siswa?.nama?.isEmpty ?? true) &&
+              (siswa?.hpSiswa?.isEmpty ?? true)) {
+            Future.microtask(() {
+              if (mounted) {
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          CreateProfile(kelasList: kelasList)),
+                );
+              }
+            });
+
+            return Scaffold(
+              backgroundColor: Colors.red,
+              body: Container(
+                color: Colors.white,
+                child: const Center(child: CircularProgressIndicator()),
+              ), // Tambahkan loading sementara
+            );
+          }
+
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
+            ),
+            drawer: Drawer(
+              backgroundColor: Colors.white,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  DrawerHeader(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/SMKN2.png',
+                          width: 80,
+                          height: 80,
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                          'SIM-PKL',
+                          style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
+                        )
+                      ],
+                    ),
                   ),
-                  const SizedBox(
-                    width: 20,
+                  // Membuat item drawer untuk setiap halaman
+                  ..._pages.keys.map((String pageName) {
+                    return ListTile(
+                      hoverColor: Colors.white,
+                      title: Text(pageName),
+                      // Menambahkan warna latar belakang saat halaman dipilih
+                      tileColor: _currentPage == pageName
+                          ? Colors.blue.withOpacity(0.1)
+                          : null,
+                      // Menambahkan leading icon yang berubah saat dipilih
+                      leading: Icon(
+                        _getIconForPage(pageName),
+                        color: _currentPage == pageName
+                            ? Colors.blue
+                            : Colors.grey,
+                      ),
+                      selected: _currentPage == pageName,
+                      onTap: () {
+                        // Menutup drawer
+                        Navigator.pop(context);
+                        // Memperbarui halaman yang ditampilkan
+                        setState(() {
+                          _currentPage = pageName;
+                        });
+                      },
+                    );
+                  }),
+                  ListTile(
+                    leading: const Icon(Icons.logout, color: Colors.red),
+                    title: const Text('Logout'),
+                    onTap: () {
+                      // Konfirmasi logout
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Konfirmasi Logout'),
+                            content:
+                                const Text('Apakah Anda yakin ingin logout?'),
+                            actions: [
+                              TextButton(
+                                child: const Text('Batal'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                ),
+                                onPressed: () async {
+                                  if (authProvider.currentUser?.token == null) {
+                                    return; // Hindari error jika user sudah logout sebelumnya
+                                  }
+                                  await authProvider
+                                      .logout(authProvider.currentUser!.token!).then((value){
+                                        profileProvider.clearProfileData();
+                                      });
+                                  // Kembali ke halaman login
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder: (context) => const LoginPage(),
+                                    ),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                },
+                                child: Text(
+                                  'Logout',
+                                  style:
+                                      GoogleFonts.poppins(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   ),
-                  Text(
-                    'SIM-PKL',
-                    style: GoogleFonts.poppins(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  )
                 ],
               ),
             ),
-            // Membuat item drawer untuk setiap halaman
-            ..._pages.keys.map((String pageName) {
-              return ListTile(
-                hoverColor: Colors.white,
-                title: Text(pageName),
-                // Menambahkan warna latar belakang saat halaman dipilih
-                tileColor: _currentPage == pageName
-                    ? Colors.blue.withOpacity(0.1)
-                    : null,
-                // Menambahkan leading icon yang berubah saat dipilih
-                leading: Icon(
-                  _getIconForPage(pageName),
-                  color: _currentPage == pageName ? Colors.blue : Colors.grey,
-                ),
-                selected: _currentPage == pageName,
-                onTap: () {
-                  // Menutup drawer
-                  Navigator.pop(context);
-                  // Memperbarui halaman yang ditampilkan
-                  setState(() {
-                    _currentPage = pageName;
-                  });
-                },
-              );
-            }),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout'),
-              onTap: () {
-                // Konfirmasi logout
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Konfirmasi Logout'),
-                      content: const Text('Apakah Anda yakin ingin logout?'),
-                      actions: [
-                        TextButton(
-                          child: const Text('Batal'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                          ),
-                          onPressed: () async {
-                            await authProvider
-                                .logout(authProvider.currentUser!.token!);
-                            // Kembali ke halaman login
-                            // ignore: use_build_context_synchronously
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => const LoginPage(),
-                              ),
-                              (Route<dynamic> route) => false,
-                            );
-                          },
-                          child: Text('Logout', style: GoogleFonts.poppins(color: Colors.white),),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-      body: _pages[_currentPage],
-    );
+            body: _pages[_currentPage],
+          );
+        });
   }
 
   IconData _getIconForPage(String pageName) {

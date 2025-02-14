@@ -28,6 +28,8 @@ class BaseApi{
   var addDepartmentPath = Uri.parse("$api/department");
   var addTeacherPath = Uri.parse("$api/teacher");
   var addStudentPath = Uri.parse("$api/student");
+  var addProfileStudentPath = Uri.parse("$api/profil/siswa");
+  var addProfileTeacherPath = Uri.parse("$api/teacher/profile");
   var addInstrukturPath = Uri.parse("$api/instruktur");
   var addCorporatePath = Uri.parse("$api/korporat");
   var toggleActivePath = Uri.parse("$api/user/active");

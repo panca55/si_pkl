@@ -15,7 +15,13 @@ class AuthController extends BaseApi with ChangeNotifier {
   
   String? _token;
   String? get authToken => _token;
-
+  void clearUserData() {
+    _users.clear();
+    _currentUser = null;
+    _token = null;
+    api.setToken(''); 
+    notifyListeners();
+  }
   Future<bool> login(String email, String password) async {
     var body = jsonEncode({'email': email, 'password': password});
     http.Response response =
@@ -88,10 +94,7 @@ class AuthController extends BaseApi with ChangeNotifier {
     );
 
     if (response.statusCode == 200) {
-      _token = null;
-      _currentUser = null;
-      api.setToken(''); // Hapus token dari API helper
-      notifyListeners();
+      clearUserData();
       debugPrint("Logout berhasil.");
       return true;
     } else {

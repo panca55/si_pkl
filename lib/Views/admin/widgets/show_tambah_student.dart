@@ -335,6 +335,11 @@ Future<void> showTambahStudentPopup(
                         },
                       ),
                       const SizedBox(height: 10),
+                      if (fileBytes != null)
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.memory(fileBytes!)),
+                      const SizedBox(height: 5),
                       Row(
                         children: [
                           ElevatedButton(
