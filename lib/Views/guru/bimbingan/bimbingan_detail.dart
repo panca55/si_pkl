@@ -199,8 +199,8 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                             : '-';
                   
                         final imageUrl = absentsData.keterangan == 'HADIR'
-                            ? 'http://127.0.0.1:8000/storage/Absents-Siswa/${absentsData.photo}'
-                            : 'http://127.0.0.1:8000/storage/Surat-Izin-Siswa/${absentsData.photo}';
+                            ? 'https://sigapkl-smkn2padang.com/storage/Absents-Siswa/${absentsData.photo}'
+                            : 'https://sigapkl-smkn2padang.com/storage/Surat-Izin-Siswa/${absentsData.photo}';
                   
                         return DataRow(
                           cells: <DataCell>[
@@ -409,7 +409,7 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.network(
-                                'http://127.0.0.1:8000/storage/public/foto-kegiatan/${logbook.fotoKegiatan}',
+                                'https://sigapkl-smkn2padang.com/storage/public/foto-kegiatan/${logbook.fotoKegiatan}',
                                 fit: BoxFit.cover,
                                 height: 80,
                                 width: double.infinity,

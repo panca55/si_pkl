@@ -81,7 +81,7 @@ class _ProfileGuruState extends State<ProfileGuru> {
               child: ListView(
                 children: [
                   Image.network(
-                    'http://127.0.0.1:8000/storage/public/students-images/${guru.foto}',
+                    'https://sigapkl-smkn2padang.com/storage/public/students-images/${guru.foto}',
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
                         Icons.broken_image,
