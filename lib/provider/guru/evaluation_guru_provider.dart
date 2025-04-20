@@ -1,6 +1,5 @@
-// ignore_for_file: avoid_web_libraries_in_flutter
-
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
@@ -8,7 +7,6 @@ import 'package:printing/printing.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/guru/evaluation_model.dart';
-import 'dart:html' as html;
 
 class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
   EvaluationModel? _evaluationModel;
@@ -45,6 +43,7 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
       debugPrint('Bimbingan Siswa Provider Error: $e');
     }
   }
+
   Future<void> getPrintEvaluation(int id) async {
     final tokenUser = authController.authToken;
 
@@ -67,19 +66,16 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
 
         // Ubah data PDF menjadi byte array
         Uint8List pdfData = response.bodyBytes;
+
         if (kIsWeb) {
-          final blob = html.Blob([pdfData]);
-          final url = html.Url.createObjectUrlFromBlob(blob);
-          html.AnchorElement(href: url)
-            ..target = 'blank'
-            ..download = 'assessment.pdf'
-            ..click();
-          html.Url.revokeObjectUrl(url);
-          return;
+          // Logika untuk platform web
+          // await _downloadPdfWeb(pdfData, 'assessment.pdf');
+        } else {
+          // Logika untuk platform non-web
+          await Printing.layoutPdf(
+            onLayout: (PdfPageFormat format) async => pdfData,
+          );
         }
-        await Printing.layoutPdf(
-          onLayout: (PdfPageFormat format) async => pdfData,
-        );
 
         debugPrint('File berhasil dicetak.');
         notifyListeners();
@@ -90,7 +86,18 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
       debugPrint('Print Error: $e');
     }
   }
-  
+
+  // Future<void> _downloadPdfWeb(Uint8List pdfData, String fileName) async {
+  //   // Fungsi khusus untuk mengunduh file PDF di platform web
+  //   final blob = html.Blob([pdfData]);
+  //   final url = html.Url.createObjectUrlFromBlob(blob);
+  //   final anchor = html.AnchorElement(href: url)
+  //     ..target = 'blank'
+  //     ..download = fileName
+  //     ..click();
+  //   html.Url.revokeObjectUrl(url);
+  // }
+
   Future<Uint8List?> getShowEvaluation(int id) async {
     final tokenUser = authController.authToken;
 
@@ -118,7 +125,6 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
       return null;
     }
   }
-
 
   Future<void> submitEvaluation({
     required int internshipId,
@@ -152,12 +158,12 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('Berhasil submit logbook');
         final newEvaluation = Evaluation(
-            internshipId: internshipId,
-            monitoring: monitoring,
-            sertifikat: sertifikat,
-            logbook: logbook,
-            presentasi: presentasi,
-            );
+          internshipId: internshipId,
+          monitoring: monitoring,
+          sertifikat: sertifikat,
+          logbook: logbook,
+          presentasi: presentasi,
+        );
         _evaluation = newEvaluation;
         notifyListeners();
         debugPrint('Evaluation: $newEvaluation');

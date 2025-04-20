@@ -1,7 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker_web/image_picker_web.dart';
+// import 'package:image_picker_web/image_picker_web.dart';
 
 Future<void> showAttendancePopup({
   required BuildContext context,
@@ -50,9 +50,9 @@ Future<void> showAttendancePopup({
                   if (!kIsWeb || kIsWeb)
                     ElevatedButton(
                       onPressed: () async {
-                        capturedImageBytes =
-                            await ImagePickerWeb.getImageAsBytes();
-                        setState(() {});
+                        // capturedImageBytes =
+                            // await ImagePickerWeb.getImageAsBytes();
+                        // setState(() {});
                       },
                       child: const Text("Ambil Foto (Web)"),
                     ),

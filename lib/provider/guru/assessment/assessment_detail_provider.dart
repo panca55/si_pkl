@@ -7,7 +7,7 @@ import 'package:si_pkl/models/guru/assessment/assessment_detail_model.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 class AssessmentDetailProvider extends BaseApi with ChangeNotifier {
   AssessmentDetailModel? _assessmentDetailModel;
@@ -66,14 +66,14 @@ class AssessmentDetailProvider extends BaseApi with ChangeNotifier {
         // Ubah data PDF menjadi byte array
         Uint8List pdfData = response.bodyBytes;
         if (kIsWeb) {
-          final blob = html.Blob([pdfData]);
-          final url = html.Url.createObjectUrlFromBlob(blob);
-          html.AnchorElement(href: url)
-            ..target = 'blank'
-            ..download = 'assessment.pdf'
-            ..click();
-          html.Url.revokeObjectUrl(url);
-          return;
+          // final blob = html.Blob([pdfData]);
+          // final url = html.Url.createObjectUrlFromBlob(blob);
+          // html.AnchorElement(href: url)
+          //   ..target = 'blank'
+          //   ..download = 'assessment.pdf'
+          //   ..click();
+          // html.Url.revokeObjectUrl(url);
+          // return;
         }
         await Printing.layoutPdf(
           onLayout: (PdfPageFormat format) async => pdfData,

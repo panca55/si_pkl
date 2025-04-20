@@ -7,7 +7,7 @@ import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/instruktur/sertifikat/sertifikat_detail_model.dart';
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 class SertifikatDetailProvider extends BaseApi with ChangeNotifier {
   SertifikatDetailModel? _sertifikatDetailModel;
@@ -72,14 +72,14 @@ class SertifikatDetailProvider extends BaseApi with ChangeNotifier {
         // Ubah data PDF menjadi byte array
         Uint8List pdfData = response.bodyBytes;
         if (kIsWeb) {
-          final blob = html.Blob([pdfData]);
-          final url = html.Url.createObjectUrlFromBlob(blob);
-          html.AnchorElement(href: url)
-            ..target = 'blank'
-            ..download = 'sertifikat.pdf'
-            ..click();
-          html.Url.revokeObjectUrl(url);
-          return;
+          // final blob = html.Blob([pdfData]);
+          // final url = html.Url.createObjectUrlFromBlob(blob);
+          // html.AnchorElement(href: url)
+          //   ..target = 'blank'
+          //   ..download = 'sertifikat.pdf'
+          //   ..click();
+          // html.Url.revokeObjectUrl(url);
+          // return;
         }
         await Printing.layoutPdf(
           onLayout: (PdfPageFormat format) async => pdfData,
