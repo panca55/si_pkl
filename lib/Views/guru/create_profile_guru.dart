@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/guru/dashboard_side_guru.dart';
-import 'package:si_pkl/Views/siswa/dashboard_side.dart';
+// import 'package:si_pkl/Views/siswa/dashboard_side.dart';
 import 'package:si_pkl/provider/guru/profile_guru_provider.dart';
 
 class CreateProfileGuru extends StatefulWidget {
