@@ -1,5 +1,5 @@
 class BaseApi{
-  static var base =  "https://sigapkl-smkn2padang.com";
+  static var base =  "http://127.0.0.1:8000";
   static var api = "$base/api";
   
   var authPath = Uri.parse("$api/login");

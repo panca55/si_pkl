@@ -216,7 +216,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                   )),
                                 ),
                                 onTap: () async {
-                                  if (_formKey.currentState!.validate()) {
+                                  if (_formKey.currentState!.validate() &&
+                                      _passwordController.text ==
+                                          _passwordConfirmController.text && (_passwordController.text.length >= 8 && _passwordConfirmController.text.length >= 8)) {
                                     try {
                                       await authProvider
                                           .register(
