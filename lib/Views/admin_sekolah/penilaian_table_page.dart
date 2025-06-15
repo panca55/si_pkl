@@ -46,68 +46,76 @@ class PenilaianTablePage extends StatelessWidget {
                   ),
                 ),
                 Consumer<EvaluationsProvider>(
-                  builder: (context, provider, child) {
-                    final tanggalPenilaian = provider.evaluationsModel?.evaluationsDates?.toList() ?? [];
-                    final isTanggalPenilaian = tanggalPenilaian.isNotEmpty;
-                    final tanggalMulai = tanggalPenilaian.first.startDate;
-                    final tanggalAkhir = tanggalPenilaian.first.endDate;
-                    return Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF233446),
-                          borderRadius: BorderRadius.circular(8)
-                        ),
-                        width: MediaQuery.of(context).size.width,
-                        child: Column(
-                          children: [
-                            Text('Tanggal Penilaian', style: GoogleFonts.poppins(color: Colors.white),),
-                            if(isTanggalPenilaian)
-                            Text(
-                              '${DateFormat('dd MMMM yyyy').format(tanggalMulai!)} - ${DateFormat('dd MMMM yyyy').format(tanggalAkhir!)}',
-                              style: GoogleFonts.poppins(color: Colors.red.shade900, fontWeight: FontWeight.bold),
-                            )
-                            else
-                            Text(
-                              'Belum Diisi',
-                              style: GoogleFonts.poppins(color: Colors.red.shade900,
-                                fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 10),
-                            if(isTanggalPenilaian)
-                            GestureDetector(
-                              onTap: (){},
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF233446),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.white)
-                                ),
-                                child: Text(
-                                  'Edit Tanggal Penilaian',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 16,))
-                                )
-                            )
-                            else 
-                            GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                        color: const Color(0xFF233446),
-                                        borderRadius: BorderRadius.circular(8),
-                                        border:
-                                            Border.all(color: Colors.white)),
-                                    child: Text('Buat Tanggal Penilaian',
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ))))
-                          ],
-                        ),
-                    );
+                    builder: (context, provider, child) {
+                  final tanggalPenilaian =
+                      provider.evaluationsModel?.evaluationsDates?.toList() ??
+                          [];
+                  final isTanggalPenilaian = tanggalPenilaian.isNotEmpty;
+                  DateTime? tanggalMulai;
+                  DateTime? tanggalAkhir;
+                  if (isTanggalPenilaian) {
+                    tanggalMulai = tanggalPenilaian.first.startDate;
+                    tanggalAkhir = tanggalPenilaian.first.endDate;
                   }
-                ),
+                  return Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                        color: const Color(0xFF233446),
+                        borderRadius: BorderRadius.circular(8)),
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Tanggal Penilaian',
+                          style: GoogleFonts.poppins(color: Colors.white),
+                        ),
+                        if (isTanggalPenilaian &&
+                            tanggalMulai != null &&
+                            tanggalAkhir != null)
+                          Text(
+                            '${DateFormat('dd MMMM yyyy').format(tanggalMulai)} - ${DateFormat('dd MMMM yyyy').format(tanggalAkhir)}',
+                            style: GoogleFonts.poppins(
+                                color: Colors.red.shade900,
+                                fontWeight: FontWeight.bold),
+                          )
+                        else
+                          Text(
+                            'Belum Diisi',
+                            style: GoogleFonts.poppins(
+                                color: Colors.red.shade900,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        const SizedBox(height: 10),
+                        if (isTanggalPenilaian)
+                          GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF233446),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.white)),
+                                  child: Text('Edit Tanggal Penilaian',
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ))))
+                        else
+                          GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF233446),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.white)),
+                                  child: Text('Buat Tanggal Penilaian',
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ))))
+                      ],
+                    ),
+                  );
+                }),
                 Consumer<EvaluationsProvider?>(
                   builder: (context, provider, child) {
                     final penilaian =

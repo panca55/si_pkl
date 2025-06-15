@@ -7,6 +7,7 @@ import 'package:si_pkl/Views/admin/dashboard_side_admin.dart';
 import 'package:si_pkl/Views/admin_sekolah/dashboard_side_admin_sekolah.dart';
 import 'package:si_pkl/Views/guru/dashboard_side_guru.dart';
 import 'package:si_pkl/Views/instruktur/dashboard_side_instruktur.dart';
+import 'package:si_pkl/Views/perusahaan/dashboard_side_perusahaan.dart';
 import 'package:si_pkl/Views/pimpinan/dashboard_side_pimpinan.dart';
 import 'package:si_pkl/Views/register_page.dart';
 import 'package:si_pkl/Views/siswa/dashboard_side.dart';
@@ -246,10 +247,14 @@ class _LoginPageState extends State<LoginPage> {
                                                       const DashboardSide()));
                                           break;
                                         case 'ADMIN':
-                                        case 'PERUSAHAAN':
                                           Navigator.of(ctx).push(MaterialPageRoute(
                                               builder: (context) =>
                                                   const DashboardSideAdmin()));
+                                          break;
+                                        case 'PERUSAHAAN':
+                                          Navigator.of(ctx).push(MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const DashboardSidePerusahaan()));
                                           break;
                                         case 'INSTRUKTUR':
                                           Navigator.of(ctx).push(MaterialPageRoute(
