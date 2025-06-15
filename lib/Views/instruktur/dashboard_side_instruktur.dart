@@ -63,8 +63,8 @@ class _DashboardSideInstrukturState extends State<DashboardSideInstruktur> {
               Provider.of<CorporationsProvider>(context);
           final corporateList = coprorationProvider.corporation.toList();
           final instruktur = profileProvider.currentInstruktur?.profile;
-          if ((instruktur?.nama?.isEmpty ?? true) &&
-              (instruktur?.hp?.isEmpty ?? true)) {
+          if ((instruktur?.nama?.isEmpty ?? false) &&
+              (instruktur?.hp?.isEmpty ?? false)) {
             Future.microtask(() {
               if (mounted) {
                 // ignore: use_build_context_synchronously

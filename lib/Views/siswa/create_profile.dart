@@ -172,6 +172,7 @@ class _CreateProfileState extends State<CreateProfile> {
                           DropdownButtonFormField<String>(
                             isExpanded: true,
                             decoration: const InputDecoration(
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
                               labelText: "TAHUN AJARAN",
                               border: OutlineInputBorder(),
                             ),

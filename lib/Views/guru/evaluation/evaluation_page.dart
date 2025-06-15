@@ -53,7 +53,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Penilaian Monitoring',
+                      'Penilaian Akhir Siswa',
                       style: GoogleFonts.poppins(
                         color: Colors.grey.shade700,
                         fontSize: 18,
@@ -61,17 +61,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
                       ),
                     ),
                   ),
-                  if (evaluation == null || evaluation.isEmpty)
-                    const Center(
-                      child: Text(
-                        'Mengambil data siswa monitoring',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  if (periode == null)
+                  if (evaluation == null || evaluation.isEmpty || periode == null)
                     const Center(
                       child: Text(
                         'Mengambil data siswa monitoring',

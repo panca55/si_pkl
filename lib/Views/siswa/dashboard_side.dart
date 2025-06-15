@@ -63,8 +63,8 @@ class _DashboardSideState extends State<DashboardSide> {
           debugPrint(authProvider.currentUser!.token);
           final kelasList = mayorProvider.mayorsModel?.mayor?.toList() ?? [];
           final siswa = profileProvider.currentSiswa;
-          if ((siswa?.nama?.isEmpty ?? true) &&
-              (siswa?.hpSiswa?.isEmpty ?? true)) {
+          if ((siswa?.nama?.isEmpty ?? false) &&
+              (siswa?.hpSiswa?.isEmpty ?? false)) {
             Future.microtask(() {
               if (mounted) {
                 // ignore: use_build_context_synchronously

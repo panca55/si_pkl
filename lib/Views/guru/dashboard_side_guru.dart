@@ -47,8 +47,8 @@ class _DashboardSideGuruState extends State<DashboardSideGuru> {
       future: profileProvider.getProfileguru(),
       builder: (context, snapshot) {
         final guru = profileProvider.currentguru?.teacher;
-        if ((guru?.nama?.isEmpty ?? true) &&
-            (guru?.hp?.isEmpty ?? true)) {
+        if ((guru?.nama?.isEmpty ?? false) &&
+            (guru?.nip?.isEmpty ?? false)) {
           Future.microtask(() {
             if (mounted) {
               // ignore: use_build_context_synchronously
