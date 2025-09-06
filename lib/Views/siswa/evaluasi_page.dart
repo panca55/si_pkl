@@ -47,10 +47,10 @@ class _EvaluasiPageState extends State<EvaluasiPage> {
               evaluationProvider.evaluationModel?.isEvaluationEmpty;
           final evaluationDate =
               evaluationProvider.evaluationModel?.evaluationDate;
-
+          debugPrint('Evaluation Data: ${evaluation?.sertifikat}');
+          debugPrint('Evaluation Data: $evaluationDate');
           // Handle if `evaluation` is null
-          if (evaluation == null ||
-              evaluationDate == null) {
+          if (evaluation == null || evaluationDate == null) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -116,68 +116,25 @@ class _EvaluasiPageState extends State<EvaluasiPage> {
                       ),
                       const SizedBox(height: 8),
                       Table(
+                        columnWidths: const {
+                          0: FixedColumnWidth(40),
+                          1: FlexColumnWidth(2),
+                          2: FixedColumnWidth(80),
+                        },
+                        border: TableBorder.all(
+                            color: Colors.grey.shade300, width: 1),
                         children: [
-                          TableRow(children: [
-                            TableCell(
-                                child: Text(
-                              'No',
-                              style: GoogleFonts.poppins(),
-                            )),
-                            TableCell(
-                                child: Text('Aspek Penilaian',
-                                    style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text('Nilai',
-                                    style: GoogleFonts.poppins())),
-                          ]),
-                          TableRow(children: [
-                            TableCell(
-                                child: Text('1', style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text('Rata-Rata Nilai Monitoring',
-                                    style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text(evaluation.monitoring.toString(),
-                                    style: GoogleFonts.poppins())),
-                          ]),
-                          TableRow(children: [
-                            TableCell(
-                                child: Text('2', style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text('Rata - Rata Nilai Sertifikat PKL',
-                                    style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text(evaluation.sertifikat.toString(),
-                                    style: GoogleFonts.poppins())),
-                          ]),
-                          TableRow(children: [
-                            TableCell(
-                                child: Text('3', style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text('Laporan PKL',
-                                    style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text(evaluation.logbook.toString(),
-                                    style: GoogleFonts.poppins())),
-                          ]),
-                          TableRow(children: [
-                            TableCell(
-                                child: Text('4', style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text('Presentasi',
-                                    style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text(evaluation.presentasi.toString(),
-                                    style: GoogleFonts.poppins())),
-                          ]),
-                          TableRow(children: [
-                            TableCell(
-                                child: Text('Nilai Akhir',
-                                    style: GoogleFonts.poppins())),
-                            TableCell(
-                                child: Text(evaluation.nilaiAkhir.toString(),
-                                    style: GoogleFonts.poppins())),
-                          ]),
+                          _buildTableHeader(),
+                          _buildTableRow('1', 'Rata-Rata Nilai Monitoring',
+                              evaluation.monitoring),
+                          _buildTableRow('2', 'Rata-Rata Nilai Sertifikat PKL',
+                              evaluation.sertifikat),
+                          _buildTableRow(
+                              '3', 'Laporan PKL', evaluation.logbook),
+                          _buildTableRow(
+                              '4', 'Presentasi', evaluation.presentasi),
+                          _buildTableRow(
+                              '5', 'Nilai Akhir', evaluation.nilaiAkhir),
                         ],
                       ),
                     ],
@@ -187,6 +144,42 @@ class _EvaluasiPageState extends State<EvaluasiPage> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  TableRow _buildTableHeader() {
+    return TableRow(
+      decoration: BoxDecoration(color: Colors.amber.shade100),
+      children: [
+        _buildCell('No', isHeader: true),
+        _buildCell('Aspek Penilaian', isHeader: true),
+        _buildCell('Nilai', isHeader: true),
+      ],
+    );
+  }
+
+  TableRow _buildTableRow(String no, String aspek, dynamic nilai) {
+    return TableRow(
+      children: [
+        _buildCell(no),
+        _buildCell(aspek),
+        _buildCell(nilai?.toString() ?? '-'),
+      ],
+    );
+  }
+
+  Widget _buildCell(String text, {bool isHeader = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.poppins(
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+          fontSize: isHeader ? 13 : 12,
+          color: isHeader ? Colors.black87 : Colors.black,
+        ),
       ),
     );
   }

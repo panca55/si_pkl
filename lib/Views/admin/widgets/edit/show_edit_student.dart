@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/admin/mayors_model.dart' as mayor;
 import 'package:si_pkl/models/admin/students_model.dart';
 import 'package:si_pkl/models/admin/users_model.dart' as user;
@@ -30,14 +31,14 @@ Future<void> showEditStudentPopup(
   final TextEditingController noHpOrtuController = TextEditingController();
 
   String? selectedJenisKelamin = student.jenisKelamin;
-  konsentrasiController.text = student.konsentrasi ??'';
+  konsentrasiController.text = student.konsentrasi ?? '';
   nisnController.text = student.nisn ?? '';
   alamatSiswaController.text = student.alamatSiswa ?? '';
   alamatOrtuController.text = student.alamatOrtu ?? '';
   tempatLahirController.text = student.tempatLahir ?? '';
   noHpSiswaController.text = student.hpSiswa ?? '';
   noHpOrtuController.text = student.hpOrtu ?? '';
-  
+
   final username = user?.name ?? '';
   userNameController.text = username;
   nameController.text = username;
@@ -49,7 +50,7 @@ Future<void> showEditStudentPopup(
     tahunAjaranList.add('$i/${i + 1}');
   }
   int? selectedKelas = kelas.id;
-  
+
   String? tahunAjaran = student.tahunMasuk;
   DateTime? selectedDate = DateTime.parse(student.tanggalLahir!);
   tanggalLahirController.text = student.tanggalLahir ?? '';
@@ -65,9 +66,7 @@ Future<void> showEditStudentPopup(
     if (pickedDate != null) {
       selectedDate = pickedDate;
     }
-    
   }
-
 
   Future<void> pickFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -127,12 +126,13 @@ Future<void> showEditStudentPopup(
                         controller: userNameController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          labelText: "USERNAME",
-                          floatingLabelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.bold),
-                          border: const OutlineInputBorder(),
-                          fillColor: const Color.fromARGB(255, 161, 169, 177),
-                          filled: true
-                        ),
+                            labelText: "USERNAME",
+                            floatingLabelStyle: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                            border: const OutlineInputBorder(),
+                            fillColor: const Color.fromARGB(255, 161, 169, 177),
+                            filled: true),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'username tidak boleh kosong';
@@ -353,13 +353,23 @@ Future<void> showEditStudentPopup(
                         },
                       ),
                       const SizedBox(height: 10),
-                      if(fileBytes != null)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Image.memory(fileBytes!))
-                      else if(fileName != null)
-                      Align(alignment: Alignment.centerLeft,
-                        child: Image.network('https://sigapkl-smkn2padang.com/storage/public/students-images/$fileName',height: 40,width: 40, errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 40,),)),
+                      if (fileBytes != null)
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.memory(fileBytes!))
+                      else if (fileName != null)
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.network(
+                              '${BaseApi.base}/storage/public/students-images/$fileName',
+                              height: 40,
+                              width: 40,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                Icons.image,
+                                size: 40,
+                              ),
+                            )),
                       const SizedBox(height: 5),
                       Row(
                         children: [

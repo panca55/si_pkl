@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/provider/instruktur/profile_instruktur_provider.dart';
 
@@ -76,10 +77,10 @@ class _ProfileInstrukturState extends State<ProfileInstruktur> {
               child: ListView(
                 children: [
                   Image.network(
-                    'https://sigapkl-smkn2padang.com/storage/public/students-images/${instruktur.foto}',
+                    '${BaseApi.base}/storage/public/students-images/${instruktur.foto}',
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
-                        Icons.broken_image,
+                        Icons.person,
                         size: 100,
                         color: Colors.grey,
                       );

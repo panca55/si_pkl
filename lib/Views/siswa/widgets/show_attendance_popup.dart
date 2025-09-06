@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 // import 'package:image_picker_web/image_picker_web.dart';
 
 Future<void> showAttendancePopup({
@@ -47,43 +48,43 @@ Future<void> showAttendancePopup({
                 ),
                 const SizedBox(height: 16),
                 if (selectedStatus != null) ...[
-                  if (!kIsWeb || kIsWeb)
+                  if (kIsWeb)
                     ElevatedButton(
                       onPressed: () async {
-                        // capturedImageBytes =
-                            // await ImagePickerWeb.getImageAsBytes();
-                        // setState(() {});
+                        capturedImageBytes =
+                            await ImagePickerWeb.getImageAsBytes();
+                        setState(() {});
                       },
                       child: const Text("Ambil Foto (Web)"),
                     ),
-                  if(!kIsWeb || kIsWeb)
+                  if (!kIsWeb)
                     SizedBox(
                       height: 200,
                       child: CameraPreview(cameraController!),
                     ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final XFile image =
-                            await cameraController!.takePicture();
-                        filePath = image.path;
-                        capturedImageBytes = await image.readAsBytes();
-                        setState(() {});
-                      },
-                      child: const Text("Ambil Foto (Mobile)"),
-                    ),
-                  ],
                   const SizedBox(height: 16),
-                  if (capturedImageBytes != null)
-                    Image.memory(
-                      capturedImageBytes!,
-                      width: 150,
-                      height: 150,
-                      fit: BoxFit.cover,
-                    )
-                  else
-                    const Text("Foto belum diambil."),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final XFile image = await cameraController!.takePicture();
+                      filePath = image.path;
+                      capturedImageBytes = await image.readAsBytes();
+                      setState(() {});
+                      debugPrint("File path dikirim: $filePath");
+                    },
+                    child: const Text("Ambil Foto"),
+                  ),
                 ],
+                const SizedBox(height: 16),
+                if (capturedImageBytes != null)
+                  Image.memory(
+                    capturedImageBytes!,
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  )
+                else
+                  const Text("Foto belum diambil."),
+              ],
             ),
             actions: [
               TextButton(
@@ -96,7 +97,7 @@ Future<void> showAttendancePopup({
                 onPressed: selectedStatus != null && capturedImageBytes != null
                     ? () {
                         onSubmit(selectedStatus!, capturedImageBytes, filePath);
-                        Navigator.pop(context);
+                        Navigator.pop(context, true);
                       }
                     : null,
                 child: const Text("Simpan"),

@@ -158,7 +158,7 @@ class SiswaPklDetail extends StatelessWidget {
                 image,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
-                    Icons.broken_image,
+                    Icons.person,
                     size: 100,
                     color: Colors.grey,
                   );

@@ -52,6 +52,7 @@ class BaseApi{
 
   Uri siswaIndexPath(int? id) => Uri.parse("$api/pimpinan/siswa/$id");
   Uri editStudentPath(int? id) => Uri.parse("$api/student/$id");
+  Uri editTeacherProfilePath(int? id) => Uri.parse("$api/teacher/profile/$id");
   Uri editMayorPath(int? id) => Uri.parse("$api/mayor/$id");
   Uri editUserPath(int? id) => Uri.parse("$api/users/$id");
   Uri deleteUserPath(int? id) => Uri.parse("$api/users/$id");

@@ -36,6 +36,7 @@ class _DetailLogbookState extends State<DetailLogbook> {
           RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
       return htmlString.replaceAll(exp, '').trim();
     }
+
     final logbook = Provider.of<DetailLogbookProvider>(context, listen: false);
     final getIndexLogbook = logbook.getIndexLogbook(widget.logbookId!);
     return Scaffold(
@@ -61,7 +62,7 @@ class _DetailLogbookState extends State<DetailLogbook> {
                     : null;
             debugPrint('noteID: $noteId');
             final isiLogbook = logbookData?.isi ?? '-';
-            
+
             return SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Skeletonizer(
@@ -71,22 +72,25 @@ class _DetailLogbookState extends State<DetailLogbook> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Consumer<DetailLogbookProvider>(
-                      builder: (context, logbookDetail, child) {
-                        debugPrint('noteID Consumer: $noteId');
-                        final logbookDataDetail = logbookDetail.detailLogbookModel?.logbook;
-                        final logbookModel = logbookDetail.detailLogbookModel;
-                        final komentarPembimbing =
-                            logbookModel?.noteGuru?.catatan;
-                        final penilaianPembimbing =
-                            logbookModel?.noteGuru?.penilaian;
-                        final penilaianInstruktur =
-                            logbookModel?.noteInstruktur?.penilaian;
-                        final komentarInstruktur = logbookModel?.noteInstruktur?.catatan;
-                        final isKomentarEmpty = logbookDataDetail?.note?.isEmpty;
+                        builder: (context, logbookDetail, child) {
+                      debugPrint('noteID Consumer: $noteId');
+                      final logbookDataDetail =
+                          logbookDetail.detailLogbookModel?.logbook;
+                      final logbookModel = logbookDetail.detailLogbookModel;
+                      final komentarPembimbing =
+                          logbookModel?.noteGuru?.catatan;
+                      final penilaianPembimbing =
+                          logbookModel?.noteGuru?.penilaian;
+                      final penilaianInstruktur =
+                          logbookModel?.noteInstruktur?.penilaian;
+                      final komentarInstruktur =
+                          logbookModel?.noteInstruktur?.catatan;
+                      final isKomentarEmpty = logbookDataDetail?.note?.isEmpty;
                       debugPrint('Logbook ID: ${logbookDataDetail?.id}');
                       debugPrint(
                           'Bentuk Kegiatan: ${logbookDataDetail?.bentukKegiatan}');
-                      final tanggalPekerjaan = logbookDataDetail?.tanggal ?? '-';
+                      final tanggalPekerjaan =
+                          logbookDataDetail?.tanggal ?? '-';
                       String formattedDate;
                       loading = false;
                       try {
@@ -100,44 +104,43 @@ class _DetailLogbookState extends State<DetailLogbook> {
                       } catch (e) {
                         formattedDate = '-';
                       }
-                        return _buildInfoCard(
-                          komentarProvider: getIndexLogbook,
-                          isKomentarEmpty: isKomentarEmpty ?? true,
-                          noteId: noteId,
-                          logbook: logbook,
-                          logbookId: logbookData?.id,
-                          image:
-                              'http://localhost:8000/storage/public/students-images/${logbookDataDetail?.fotoKegiatan}',
-                          colorHeader: GlobalColorTheme.primaryBlueColor,
-                          title: 'Detail Logbook',
-                          property1: 'Judul Pekerjaan :',
-                          value1: logbookData?.judul,
-                          property2: 'Kategori :',
-                          value2: logbookData?.category,
-                          property3: 'Tanggal :',
-                          value3: formattedDate,
-                          property4: 'Bentuk Kegiatan :',
-                          value4: logbookData?.bentukKegiatan,
-                          property5: 'Waktu Pengerjaan :',
-                          value5: logbookData?.mulai,
-                          value6: logbookData?.selesai,
-                          property6: 'Petugas :',
-                          value7: logbookData?.petugas,
-                          property7: 'Deskripsi Pekerjaan :',
-                          value8: removeHtmlTags(isiLogbook),
-                          property8: 'Keterangan :',
-                          value9: logbookData?.keterangan,
-                          property9: 'Komentar Pembimbing :',
-                          value10: komentarPembimbing,
-                          property10: 'Penilaian Pembimbing :',
-                          value11: penilaianPembimbing,
-                          property11: 'Komentar Instruktur :',
-                          value12: komentarInstruktur,
-                          property12: 'Penilaian Instruktur :',
-                          value13: penilaianInstruktur,
-                        );
-                      }
-                    ),
+                      return _buildInfoCard(
+                        komentarProvider: getIndexLogbook,
+                        isKomentarEmpty: isKomentarEmpty ?? true,
+                        noteId: noteId,
+                        logbook: logbook,
+                        logbookId: logbookData?.id,
+                        image:
+                            'http://localhost:8000/storage/public/students-images/${logbookDataDetail?.fotoKegiatan}',
+                        colorHeader: GlobalColorTheme.primaryBlueColor,
+                        title: 'Detail Logbook',
+                        property1: 'Judul Pekerjaan :',
+                        value1: logbookData?.judul,
+                        property2: 'Kategori :',
+                        value2: logbookData?.category,
+                        property3: 'Tanggal :',
+                        value3: formattedDate,
+                        property4: 'Bentuk Kegiatan :',
+                        value4: logbookData?.bentukKegiatan,
+                        property5: 'Waktu Pengerjaan :',
+                        value5: logbookData?.mulai,
+                        value6: logbookData?.selesai,
+                        property6: 'Petugas :',
+                        value7: logbookData?.petugas,
+                        property7: 'Deskripsi Pekerjaan :',
+                        value8: removeHtmlTags(isiLogbook),
+                        property8: 'Keterangan :',
+                        value9: logbookData?.keterangan,
+                        property9: 'Komentar Pembimbing :',
+                        value10: komentarPembimbing,
+                        property10: 'Penilaian Pembimbing :',
+                        value11: penilaianPembimbing,
+                        property11: 'Komentar Instruktur :',
+                        value12: komentarInstruktur,
+                        property12: 'Penilaian Instruktur :',
+                        value13: penilaianInstruktur,
+                      );
+                    }),
                     const SizedBox(
                       height: 20,
                     ),
@@ -149,41 +152,40 @@ class _DetailLogbookState extends State<DetailLogbook> {
     );
   }
 
-  Widget _buildInfoCard({
-    required Color colorHeader,
-    required String title,
-    required String property1,
-    required String property2,
-    required String property3,
-    required String image,
-    String? property4,
-    String? property5,
-    String? property6,
-    String? property7,
-    String? property8,
-    String? property9,
-    String? property10,
-    String? property11,
-    String? property12,
-    String? value1,
-    String? value2,
-    String? value3,
-    String? value4,
-    String? value5,
-    String? value6,
-    String? value7,
-    String? value8,
-    String? value9,
-    String? value10,
-    String? value11,
-    String? value12,
-    String? value13,
-    required int? logbookId,
-    required int? noteId,
-    required DetailLogbookProvider logbook,
-    required Future<void> komentarProvider,
-    required bool isKomentarEmpty
-  }) {
+  Widget _buildInfoCard(
+      {required Color colorHeader,
+      required String title,
+      required String property1,
+      required String property2,
+      required String property3,
+      required String image,
+      String? property4,
+      String? property5,
+      String? property6,
+      String? property7,
+      String? property8,
+      String? property9,
+      String? property10,
+      String? property11,
+      String? property12,
+      String? value1,
+      String? value2,
+      String? value3,
+      String? value4,
+      String? value5,
+      String? value6,
+      String? value7,
+      String? value8,
+      String? value9,
+      String? value10,
+      String? value11,
+      String? value12,
+      String? value13,
+      required int? logbookId,
+      required int? noteId,
+      required DetailLogbookProvider logbook,
+      required Future<void> komentarProvider,
+      required bool isKomentarEmpty}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -212,21 +214,20 @@ class _DetailLogbookState extends State<DetailLogbook> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-              Text(
+                Text(
                   title,
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
-              ),
-              GestureDetector(
+                ),
+                GestureDetector(
                   onTap: () {
                     Navigator.pop(context);
                   },
                   child: Container(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 10),
+                    margin: const EdgeInsets.symmetric(vertical: 10),
                     padding:
                         const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                     decoration: BoxDecoration(
@@ -244,7 +245,8 @@ class _DetailLogbookState extends State<DetailLogbook> {
                     child: Text(
                       'Kembali',
                       style: GoogleFonts.poppins(
-                          color: GlobalColorTheme.primaryBlueColor, fontWeight: FontWeight.bold),
+                          color: GlobalColorTheme.primaryBlueColor,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 )
@@ -324,7 +326,7 @@ class _DetailLogbookState extends State<DetailLogbook> {
                 image,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
-                    Icons.broken_image,
+                    Icons.person,
                     size: 100,
                     color: Colors.grey,
                   );
@@ -351,48 +353,51 @@ class _DetailLogbookState extends State<DetailLogbook> {
               _buildInfoRow(property12!, value13 ?? '-'),
               const SizedBox(width: 12),
               if (isKomentarEmpty)
-              GestureDetector(
-                onTap: () {
-                  showKomentarPopup(context: context, 
-                  onSubmit:(data) {
-                    logbook.submitKomentar(
-                      logbookId: data['logbook_id'],
-                      noteType: data['note_type'],
-                      catatan: data['catatan'],
-                      penilaian: data['penilaian'],
-                    );
-                  }, logbookId: logbookId!);
-                  }, 
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5, vertical:10),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-                  decoration: BoxDecoration(
-                      color: Colors.amber,
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
-                            offset: const Offset(2, 2))
-                      ]),
-                  child: Text(
-                    'Beri Komentar',
-                    style: GoogleFonts.poppins(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                GestureDetector(
+                  onTap: () {
+                    showKomentarPopup(
+                        context: context,
+                        onSubmit: (data) {
+                          logbook.submitKomentar(
+                            logbookId: data['logbook_id'],
+                            noteType: data['note_type'],
+                            catatan: data['catatan'],
+                            penilaian: data['penilaian'],
+                          );
+                        },
+                        logbookId: logbookId!);
+                  },
+                  child: Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.amber,
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.25),
+                              offset: const Offset(2, 2))
+                        ]),
+                    child: Text(
+                      'Beri Komentar',
+                      style: GoogleFonts.poppins(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-              )
+                )
               else
-              GestureDetector(
+                GestureDetector(
                   onTap: () {
                     try {
-                      debugPrint('noteID: $noteId'); 
+                      debugPrint('noteID: $noteId');
                       showKomentarEditPopup(
-                        komentarProvider: komentarProvider,
+                          komentarProvider: komentarProvider,
                           context: context,
                           onSubmit: (data) {
                             logbook.editKomentar(
@@ -401,9 +406,9 @@ class _DetailLogbookState extends State<DetailLogbook> {
                               penilaian: data['penilaian'],
                             );
                           },
-                          id: noteId!); 
+                          id: noteId!);
                     } catch (e) {
-                      debugPrint('error: $e'); 
+                      debugPrint('error: $e');
                     }
                   },
                   child: Container(

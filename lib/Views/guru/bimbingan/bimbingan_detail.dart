@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/Views/guru/detail_logbook.dart';
 import 'package:si_pkl/models/guru/bimbingan/bimbingan_index_model.dart';
 import 'package:si_pkl/provider/guru/bimbingan_index_provider.dart';
@@ -197,19 +198,19 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                             ? DateFormat('EEEE, dd MMMM yyyy', 'id_ID')
                                 .format(tanggalAbsent)
                             : '-';
-                  
+
                         final imageUrl = absentsData.keterangan == 'HADIR'
-                            ? 'https://sigapkl-smkn2padang.com/storage/Absents-Siswa/${absentsData.photo}'
-                            : 'https://sigapkl-smkn2padang.com/storage/Surat-Izin-Siswa/${absentsData.photo}';
-                  
+                            ? '${BaseApi.base}/storage/Absents-Siswa/${absentsData.photo}'
+                            : '${BaseApi.base}/storage/Surat-Izin-Siswa/${absentsData.photo}';
+
                         return DataRow(
                           cells: <DataCell>[
                             DataCell(Text(tanggal,
                                 style: GoogleFonts.poppins(fontSize: 10))),
                             DataCell(Container(
-                              padding: const EdgeInsets.all(8),
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              decoration: BoxDecoration(
+                                padding: const EdgeInsets.all(8),
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
                                   color: absentsData.keterangan == 'HADIR'
                                       ? GlobalColorTheme.successColor
                                       : absentsData.keterangan == 'IZIN'
@@ -217,7 +218,13 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                                           : GlobalColorTheme.errorColor,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                              child: Text(absentsData.keterangan ?? '-', style: GoogleFonts.poppins(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),))),
+                                child: Text(
+                                  absentsData.keterangan ?? '-',
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 10,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ))),
                             DataCell(
                               SizedBox(
                                 height: 80,
@@ -229,7 +236,7 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return const Icon(
-                                        Icons.broken_image,
+                                        Icons.person,
                                         size: 50,
                                         color: Colors.grey,
                                       );
@@ -409,13 +416,13 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.network(
-                                'https://sigapkl-smkn2padang.com/storage/public/foto-kegiatan/${logbook.fotoKegiatan}',
+                                '${BaseApi.base}/storage/public/foto-kegiatan/${logbook.fotoKegiatan}',
                                 fit: BoxFit.cover,
                                 height: 80,
                                 width: double.infinity,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(
-                                    Icons.broken_image,
+                                    Icons.person,
                                     size: 50,
                                     color: Colors.grey,
                                   );
@@ -423,11 +430,13 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 4,),
+                          const SizedBox(
+                            height: 4,
+                          ),
                           Align(
                             alignment: Alignment.bottomCenter,
                             child: GestureDetector(
-                              onTap: (){
+                              onTap: () {
                                 final logbookId = logbook.id;
                                 debugPrint('ID yang dipilih: $logbookId: ');
                                 // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
@@ -442,24 +451,28 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                                 );
                               },
                               child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 5),
-                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal:10),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 10),
                                 decoration: BoxDecoration(
-                                  color: Colors.amber,
-                                  border: Border.all(
-                                    color: Colors.black,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.25), offset: const Offset(2, 2))
-                                  ]
-                                  ),
-                                  child: Text(
-                              'Lihat Detail',
-                              style: GoogleFonts.poppins(color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                                    color: Colors.amber,
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.black.withOpacity(0.25),
+                                          offset: const Offset(2, 2))
+                                    ]),
+                                child: Text(
+                                  'Lihat Detail',
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
                           )
@@ -569,7 +582,7 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                 image,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
-                    Icons.broken_image,
+                    Icons.person,
                     size: 100,
                     color: Colors.grey,
                   );

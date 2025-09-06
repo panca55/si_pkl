@@ -26,6 +26,9 @@ class Logbook extends StatelessWidget {
               ),
             );
           }
+          debugPrint('Berhasil mendapatkan data internship siswa');
+          
+          debugPrint('Data: ${internProvider.currentIntern?.logbook?.toList().toString()}');
           return Container(
             padding: const EdgeInsets.all(10),
             child: Container(
@@ -50,7 +53,7 @@ class Logbook extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Tambah Jurnal Harian',
+                      'Jurnal Harian',
                       style: GoogleFonts.poppins(
                         color: Colors.grey.shade700,
                         fontSize: 18,
@@ -61,9 +64,7 @@ class Logbook extends StatelessWidget {
                   Consumer<InternProvider>(
                     builder: (context, provider, child) {
                       final intern = provider.currentIntern;
-                      if (intern == null ||
-                          intern.logbook == null ||
-                          intern.logbook!.isEmpty) {
+                      if (intern!.logbook!.isEmpty) {
                         return const Padding(
                           padding: EdgeInsets.all(16.0),
                           child: Center(

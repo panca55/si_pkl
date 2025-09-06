@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Services/base_api.dart';
+import 'package:si_pkl/Views/guru/edit_profile_guru.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/provider/guru/profile_guru_provider.dart';
 
@@ -18,7 +20,8 @@ class _ProfileGuruState extends State<ProfileGuru> {
   final TextEditingController _golonganController = TextEditingController();
   final TextEditingController _jabatanController = TextEditingController();
   final TextEditingController _bidangStudiController = TextEditingController();
-  final TextEditingController _pendidikanTerakhirController = TextEditingController();
+  final TextEditingController _pendidikanTerakhirController =
+      TextEditingController();
   final TextEditingController _tempatTanggalLahirController =
       TextEditingController();
   final TextEditingController _jenisKelaminController = TextEditingController();
@@ -61,6 +64,7 @@ class _ProfileGuruState extends State<ProfileGuru> {
             if (guru == null) {
               return const Center(child: Text('Data guru tidak ditemukan.'));
             }
+            debugPrint('url: ${BaseApi.base}');
             DateTime tanggalLahir = DateTime.parse(guru.tanggalLahir!);
             String formattedDate =
                 DateFormat('dd MMMM yyyy', 'id_ID').format(tanggalLahir);
@@ -68,7 +72,7 @@ class _ProfileGuruState extends State<ProfileGuru> {
             _namaController.text = guru.nama ?? '';
             _golonganController.text = guru.golongan ?? '';
             _jabatanController.text = guru.jabatan ?? '';
-            _bidangStudiController.text = guru.bidangStudi?? '';
+            _bidangStudiController.text = guru.bidangStudi ?? '';
             _pendidikanTerakhirController.text = guru.pendidikanTerakhir ?? '';
             _tempatTanggalLahirController.text =
                 '${guru.tempatLahir ?? ''}, $formattedDate';
@@ -76,15 +80,16 @@ class _ProfileGuruState extends State<ProfileGuru> {
             _alamatController.text = guru.alamat ?? '';
             _noHpController.text = guru.hp ?? '';
             final emailSiswa = authProvider.currentUser?.user?.email;
+
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: ListView(
                 children: [
                   Image.network(
-                    'https://sigapkl-smkn2padang.com/storage/public/students-images/${guru.foto}',
+                    '${BaseApi.base}/storage/public/students-images/${guru.foto}',
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
-                        Icons.broken_image,
+                        Icons.person,
                         size: 100,
                         color: Colors.grey,
                       );
@@ -102,7 +107,7 @@ class _ProfileGuruState extends State<ProfileGuru> {
                   const SizedBox(height: 16),
                   _buildTextField(
                     controller: _nipController,
-                    label: 'NISN',
+                    label: 'NIP',
                     // enabled: false,
                   ),
                   const SizedBox(height: 16),
@@ -117,7 +122,7 @@ class _ProfileGuruState extends State<ProfileGuru> {
                       Expanded(
                         child: _buildTextField(
                           controller: _golonganController,
-                          label: 'Jurusan',
+                          label: 'Golongan',
                           // enabled: false,
                         ),
                       ),
@@ -125,7 +130,7 @@ class _ProfileGuruState extends State<ProfileGuru> {
                       Expanded(
                         child: _buildTextField(
                           controller: _jabatanController,
-                          label: 'Kelas',
+                          label: 'Jabatan',
                           // enabled: false,
                         ),
                       ),
@@ -134,7 +139,6 @@ class _ProfileGuruState extends State<ProfileGuru> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-
                       Expanded(
                         child: _buildTextField(
                           controller: _tempatTanggalLahirController,
@@ -163,7 +167,7 @@ class _ProfileGuruState extends State<ProfileGuru> {
                       Expanded(
                         child: _buildTextField(
                           controller: _alamatController,
-                          label: 'Alamat Siswa',
+                          label: 'Alamat Guru',
                           // enabled: false,
                         ),
                       ),
@@ -172,8 +176,40 @@ class _ProfileGuruState extends State<ProfileGuru> {
                   const SizedBox(height: 16),
                   _buildTextField(
                     controller: _noHpController,
-                    label: 'No HP Siswa',
+                    label: 'No HP Guru',
                     // enabled: false,
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      debugPrint('Edit Profile Tapped. ID: ${guru.id}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) => EditProfileGuru(
+                            profileId: guru.id,
+                            userId: authProvider.currentUser?.user?.id,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Edit Profile',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ),
                 ],
               ),

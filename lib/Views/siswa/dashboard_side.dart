@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/login_page.dart';
+import 'package:si_pkl/Views/pimpinan/siswa_pkl_detail.dart';
 import 'package:si_pkl/Views/siswa/create_profile.dart';
 import 'package:si_pkl/Views/siswa/dashboard.dart';
 import 'package:si_pkl/Views/siswa/evaluasi_page.dart';
@@ -22,6 +23,7 @@ class DashboardSide extends StatefulWidget {
 }
 
 class _DashboardSideState extends State<DashboardSide> {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   String _currentPage = 'Dashboard';
 
   // Daftar halaman yang tersedia
@@ -58,7 +60,8 @@ class _DashboardSideState extends State<DashboardSide> {
               ), // Tambahkan loading sementara
             ); // Loading jika masih mengambil data
           }
-          final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+          final profileProvider =
+              Provider.of<ProfileProvider>(context, listen: false);
           final mayorProvider = Provider.of<MayorsProvider>(context);
           debugPrint(authProvider.currentUser!.token);
           final kelasList = mayorProvider.mayorsModel?.mayor?.toList() ?? [];
@@ -124,29 +127,26 @@ class _DashboardSideState extends State<DashboardSide> {
                   // Membuat item drawer untuk setiap halaman
                   ..._pages.keys.map((String pageName) {
                     return ListTile(
-                      hoverColor: Colors.white,
-                      title: Text(pageName),
-                      // Menambahkan warna latar belakang saat halaman dipilih
-                      tileColor: _currentPage == pageName
-                          ? Colors.blue.withOpacity(0.1)
-                          : null,
-                      // Menambahkan leading icon yang berubah saat dipilih
-                      leading: Icon(
-                        _getIconForPage(pageName),
-                        color: _currentPage == pageName
-                            ? Colors.blue
-                            : Colors.grey,
-                      ),
-                      selected: _currentPage == pageName,
-                      onTap: () {
-                        // Menutup drawer
-                        Navigator.pop(context);
-                        // Memperbarui halaman yang ditampilkan
-                        setState(() {
-                          _currentPage = pageName;
+                        hoverColor: Colors.white,
+                        title: Text(pageName),
+                        // Menambahkan warna latar belakang saat halaman dipilih
+                        tileColor: _currentPage == pageName
+                            ? Colors.blue.withOpacity(0.1)
+                            : null,
+                        // Menambahkan leading icon yang berubah saat dipilih
+                        leading: Icon(
+                          _getIconForPage(pageName),
+                          color: _currentPage == pageName
+                              ? Colors.blue
+                              : Colors.grey,
+                        ),
+                        selected: _currentPage == pageName,
+                        onTap: () {
+                          Navigator.pop(context);
+                          setState(() {
+                            _currentPage = pageName;
+                          });
                         });
-                      },
-                    );
                   }),
                   ListTile(
                     leading: const Icon(Icons.logout, color: Colors.red),
@@ -176,9 +176,10 @@ class _DashboardSideState extends State<DashboardSide> {
                                     return; // Hindari error jika user sudah logout sebelumnya
                                   }
                                   await authProvider
-                                      .logout(authProvider.currentUser!.token!).then((value){
-                                        profileProvider.clearProfileData();
-                                      });
+                                      .logout(authProvider.currentUser!.token!)
+                                      .then((value) {
+                                    profileProvider.clearProfileData();
+                                  });
                                   // Kembali ke halaman login
                                   // ignore: use_build_context_synchronously
                                   Navigator.of(context).pushAndRemoveUntil(
@@ -203,7 +204,18 @@ class _DashboardSideState extends State<DashboardSide> {
                 ],
               ),
             ),
-            body: _pages[_currentPage],
+            body: Navigator(
+              key: _navigatorKey,
+              onGenerateRoute: (RouteSettings settings) {
+                Widget page = _pages[_currentPage]!;
+                if (settings.name == SiswaPklDetail.routname) {
+                  page = SiswaPklDetail(
+                    siswaId: ModalRoute.of(context)?.settings.arguments as int,
+                  );
+                }
+                return MaterialPageRoute(builder: (_) => page);
+              },
+            ),
           );
         });
   }

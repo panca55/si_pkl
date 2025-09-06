@@ -8,6 +8,7 @@ import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/guru/profile_model.dart';
 import 'package:universal_io/io.dart' as universal_io;
+
 class ProfileGuruProvider extends BaseApi with ChangeNotifier {
   ProfileModel? _currentGuru;
   ProfileModel? get currentguru => _currentGuru;
@@ -19,6 +20,7 @@ class ProfileGuruProvider extends BaseApi with ChangeNotifier {
     _currentGuru = null;
     notifyListeners();
   }
+
   Future<void> getProfileguru() async {
     final tokenUser = authController.authToken;
     try {
@@ -37,6 +39,7 @@ class ProfileGuruProvider extends BaseApi with ChangeNotifier {
       debugPrint('Profile Provider Error: $e');
     }
   }
+
   Future<void> createProfile(
       {required Map<String, dynamic> data,
       required Uint8List? fileBytes,
@@ -100,64 +103,90 @@ class ProfileGuruProvider extends BaseApi with ChangeNotifier {
   Future<void> editProfileGuru({
     required int id,
     required Map<String, dynamic> data,
-    required Uint8List? fileBytes,
+    Uint8List? fileBytes,
+    String? filePath,
     String? fileName,
   }) async {
     final tokenUser = authController.authToken;
     try {
-      final uri = super.editStudentPath(id);
+      debugPrint('Editing teacher profile with ID: $id');
+      final uri = super.editTeacherProfilePath(id);
+      debugPrint('Edit URI: $uri');
 
-      // Mengecek jika fileBytes ada dan bukan null
-      if (fileBytes != null) {
-        // Mengecek apakah file adalah gambar dengan ekstensi yang diterima
+      http.Response response;
+
+      if (fileBytes != null && fileName != null) {
+        // --- Gunakan MultipartRequest kalau ada file ---
+        debugPrint('Menggunakan MultipartRequest (dengan foto)');
+
+        final request = http.MultipartRequest('PUT', uri)
+          ..headers.addAll({
+            'Authorization': 'Bearer $tokenUser',
+            'Accept': 'application/json',
+          });
+
+        // Tambah fields
+        data.forEach((key, value) {
+          if (value != null && value.toString().trim().isNotEmpty) {
+            request.fields[key] = value.toString().trim();
+            debugPrint('Adding field: $key = ${value.toString().trim()}');
+          } else {
+            debugPrint('Skipping empty field: $key = $value');
+          }
+        });
+
+        // Tambah file
         final allowedExtensions = ['jpg', 'jpeg', 'png'];
-        final fileExtension = fileName?.split('.').last.toLowerCase();
+        final fileExtension = fileName.split('.').last.toLowerCase();
 
-        if (fileExtension != null &&
-            !allowedExtensions.contains(fileExtension)) {
-          debugPrint('Format gambar tidak didukung');
+        if (!allowedExtensions.contains(fileExtension)) {
           throw Exception('Format gambar tidak didukung');
         }
-
-        // Membatasi ukuran file jika lebih dari 2MB
         if (fileBytes.length > 2 * 1024 * 1024) {
-          debugPrint('Ukuran gambar terlalu besar, maksimal 2MB');
           throw Exception('Ukuran gambar terlalu besar, maksimal 2MB');
         }
 
-        // Mengonversi foto menjadi base64
-        String base64Image = base64Encode(fileBytes);
-        data['foto'] = base64Image;
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'foto',
+            fileBytes,
+            filename: fileName,
+            contentType: MediaType('image', fileExtension),
+          ),
+        );
+
+        final streamedResponse = await request.send();
+        final responseBody = await streamedResponse.stream.bytesToString();
+        response = http.Response(responseBody, streamedResponse.statusCode);
+      } else {
+        // --- Gunakan JSON biasa kalau tanpa file ---
+        debugPrint('Menggunakan http.put (tanpa foto)');
+        response = await http.put(
+          uri,
+          headers: {
+            'Authorization': 'Bearer $tokenUser',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(data),
+        );
       }
 
-      // Menyiapkan request dengan 'Content-Type' application/json
-      final response = await http.put(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $tokenUser',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(data), // Kirim data sebagai JSON
-      );
-
-      // Mengecek respon dari server
       debugPrint('Response Status Code: ${response.statusCode}');
-      final responseBody = response.body;
-      debugPrint('Response Body: $responseBody');
-      debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = json.decode(responseBody);
-        debugPrint('Berhasil edit data siswa');
-        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
-        _currentGuru = ProfileModel.fromJson(responseData);
+        final responseData = json.decode(response.body);
+        _currentGuru =
+            ProfileModel.fromJson(responseData['data'] ?? responseData);
+        debugPrint('Berhasil edit profile guru');
         notifyListeners();
       } else {
-        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+        throw Exception('Gagal update profile: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('Error edit data siswa: $e');
+      debugPrint('Error edit profile guru: $e');
+      rethrow;
     }
   }
 }

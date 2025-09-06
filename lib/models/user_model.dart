@@ -18,6 +18,7 @@ class User {
   int? id;
   String? name;
   String? email;
+  String? password;
   String? emailVerifiedAt;
   String? role;
   int? isActive;
@@ -28,6 +29,7 @@ class User {
     this.id,
     this.name,
     this.email,
+    this.password,
     this.emailVerifiedAt,
     this.role,
     this.isActive,
@@ -40,6 +42,7 @@ class User {
       id: json['id'],
       name: json['name'],
       email: json['email'],
+      password: json['password'],
       emailVerifiedAt: json['email_verified_at'],
       role: json['role'],
       isActive: json['is_active'],

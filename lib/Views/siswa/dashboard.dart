@@ -19,7 +19,6 @@ class _DashboardState extends State<Dashboard> {
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
 
-    
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
@@ -51,8 +50,8 @@ class _DashboardState extends State<Dashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Skeletonizer(
-                    enabled: loading,
-                    enableSwitchAnimation: true,
+                      enabled: loading,
+                      enableSwitchAnimation: true,
                       child: _buildWelcomeCard(name: namaSiswa ?? 'null')),
                   const SizedBox(height: 20),
                   Skeletonizer(
@@ -73,8 +72,8 @@ class _DashboardState extends State<Dashboard> {
                         value2: profileProvider
                                 .currentSiswa?.internship?.teacher?.nama ??
                             "-",
-                        value3: profileProvider
-                                .currentSiswa?.internship?.teacher?.bidangStudi ??
+                        value3: profileProvider.currentSiswa?.internship
+                                ?.teacher?.bidangStudi ??
                             "-",
                         value4: profileProvider
                                 .currentSiswa?.internship?.teacher?.jabatan ??
@@ -248,7 +247,7 @@ class _DashboardState extends State<Dashboard> {
                   image,
                   errorBuilder: (context, error, stackTrace) {
                     return const Icon(
-                      Icons.broken_image,
+                      Icons.person,
                       size: 100,
                       color: Colors.grey,
                     );

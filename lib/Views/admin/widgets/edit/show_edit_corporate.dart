@@ -3,8 +3,9 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/admin/corporations_model.dart';
-import 'package:si_pkl/models/admin/users_model.dart'as user;
+import 'package:si_pkl/models/admin/users_model.dart' as user;
 
 Future<void> showEditPerusahaanPopup(
     {required user.User? user,
@@ -22,7 +23,7 @@ Future<void> showEditPerusahaanPopup(
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController noHpController = TextEditingController();
 
-  nameController.text = perusahaan.nama ??'';
+  nameController.text = perusahaan.nama ?? '';
   quotaController.text = perusahaan.quota.toString();
   alamatController.text = perusahaan.alamat ?? '';
   noHpController.text = perusahaan.hp ?? '';
@@ -68,6 +69,7 @@ Future<void> showEditPerusahaanPopup(
       debugPrint('File dipilih: $fileName');
     }
   }
+
   Future<void> pickTime(BuildContext context, bool isStartTime) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -81,6 +83,7 @@ Future<void> showEditPerusahaanPopup(
       }
     }
   }
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -154,7 +157,7 @@ Future<void> showEditPerusahaanPopup(
                           return null;
                         },
                       ),
-                      
+
                       const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
                         isExpanded: true,
@@ -162,7 +165,15 @@ Future<void> showEditPerusahaanPopup(
                           labelText: "Mulai Hari Kerja",
                           border: OutlineInputBorder(),
                         ),
-                        items: ['Senin', 'Selasa','Rabu', 'Kamis', 'Jumat','Sabtu','Minggu']
+                        items: [
+                          'Senin',
+                          'Selasa',
+                          'Rabu',
+                          'Kamis',
+                          'Jumat',
+                          'Sabtu',
+                          'Minggu'
+                        ]
                             .map((item) => DropdownMenuItem(
                                   value: item,
                                   child: Text(item),
@@ -188,7 +199,15 @@ Future<void> showEditPerusahaanPopup(
                           labelText: "Akhir Hari Kerja",
                           border: OutlineInputBorder(),
                         ),
-                        items: ['Senin', 'Selasa','Rabu', 'Kamis', 'Jumat','Sabtu','Minggu']
+                        items: [
+                          'Senin',
+                          'Selasa',
+                          'Rabu',
+                          'Kamis',
+                          'Jumat',
+                          'Sabtu',
+                          'Minggu'
+                        ]
                             .map((item) => DropdownMenuItem(
                                   value: item,
                                   child: Text(item),
@@ -226,7 +245,8 @@ Future<void> showEditPerusahaanPopup(
                               onTap: () async {
                                 await pickTime(context, true);
                                 setState(() {
-                                  jamMulaiController.text = selectedStartTime!.format(context);
+                                  jamMulaiController.text =
+                                      selectedStartTime!.format(context);
                                 });
                               },
                             ),
@@ -237,7 +257,10 @@ Future<void> showEditPerusahaanPopup(
                               readOnly: true,
                               controller: jamBerakhirController,
                               decoration: const InputDecoration(
-                                suffixIcon: Icon(Icons.access_time_outlined, color: Colors.black,),
+                                suffixIcon: Icon(
+                                  Icons.access_time_outlined,
+                                  color: Colors.black,
+                                ),
                                 labelText: "Waktu Selesai",
                                 border: OutlineInputBorder(),
                               ),
@@ -289,7 +312,7 @@ Future<void> showEditPerusahaanPopup(
                         Align(
                             alignment: Alignment.centerLeft,
                             child: Image.network(
-                              'https://sigapkl-smkn2padang.com/storage/public/corporations-images/$fileName',
+                              '${BaseApi.base}/storage/public/corporations-images/$fileName',
                               height: 40,
                               width: 40,
                               errorBuilder: (context, error, stackTrace) =>
@@ -329,18 +352,24 @@ Future<void> showEditPerusahaanPopup(
                           const SizedBox(width: 10),
                           ElevatedButton(
                             onPressed: () {
-                              debugPrint("jam_mulai: ${selectedStartTime!.hour.toString()}:${selectedStartTime!.minute.toString()}:00");
-                              debugPrint("jam_berakhir: ${selectedEndTime!.hour.toString()}:${selectedEndTime!.minute.toString()}:00");
+                              debugPrint(
+                                  "jam_mulai: ${selectedStartTime!.hour.toString()}:${selectedStartTime!.minute.toString()}:00");
+                              debugPrint(
+                                  "jam_berakhir: ${selectedEndTime!.hour.toString()}:${selectedEndTime!.minute.toString()}:00");
                               if (formKey.currentState!.validate() &&
-                                  selectedEndTime != null && selectedStartTime != null && selectedEndTime != null &&
+                                  selectedEndTime != null &&
+                                  selectedStartTime != null &&
+                                  selectedEndTime != null &&
                                   fileBytes != null) {
                                 onSubmit({
                                   "user_id": selectedUserId,
                                   "quota": quotaController.text,
                                   "nama": nameController.text,
                                   "slug": nameController.text,
-                                  "jam_mulai": "${selectedStartTime!.hour.toString()}:${selectedStartTime!.minute.toString()}:00",
-                                  "jam_berakhir": "${selectedEndTime!.hour.toString()}:${selectedEndTime!.minute.toString()}:00",
+                                  "jam_mulai":
+                                      "${selectedStartTime!.hour.toString()}:${selectedStartTime!.minute.toString()}:00",
+                                  "jam_berakhir":
+                                      "${selectedEndTime!.hour.toString()}:${selectedEndTime!.minute.toString()}:00",
                                   "mulai_hari_kerja": mulaiHariKerja,
                                   "akhir_hari_kerja": akhirHariKerja,
                                   "alamat": alamatController.text,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/pimpinan/siswa_pkl_detail.dart';
 import 'package:si_pkl/provider/siswa/intern_provider.dart';
 import 'package:si_pkl/Views/siswa/widgets/show_logbook_form.dart';
 import 'package:si_pkl/Views/siswa/widgets/show_attendance_popup.dart';
@@ -30,7 +31,8 @@ class Pkl extends StatelessWidget {
             );
           }
           final canShowInternInfo = internProvider.canShowInternInfo;
-          final canShowAttendanceButton = internProvider.canShowAttendanceButton;
+          final canShowAttendanceButton =
+              internProvider.canShowAttendanceButton;
           debugPrint('can show intern info? $canShowInternInfo');
 
           return Container(
@@ -46,8 +48,7 @@ class Pkl extends StatelessWidget {
                   const SizedBox(height: 16),
                   if (canShowInternInfo) ...[
                     // Tampilkan informasi kehadiran jika dalam masa PKL
-                    buildAttendanceCard(
-                        context, canShowAttendanceButton),
+                    buildAttendanceCard(context, canShowAttendanceButton),
                     const SizedBox(height: 16),
                     logbookTable(context),
                     const SizedBox(height: 16),
@@ -108,49 +109,50 @@ class Pkl extends StatelessWidget {
               ),
             ),
           ),
-          internProvider.currentIntern?.kehadiranHariIni == true ?
-          GestureDetector(
-            onTap: () {
-              showLogbookForm(
-                  context: context,
-                  onSubmit: (data, fileBytes, imageFile) {
-                    Provider.of<InternProvider>(context, listen: false)
-                        .submitLogbook(
-                      judul: data['judul'],
-                      category: data['category'],
-                      tanggal: data['tanggal'],
-                      mulai: data['mulai'],
-                      selesai: data['selesai'],
-                      petugas: data['petugas'],
-                      isi: data['isi'],
-                      keterangan: data['keterangan'],
-                      fileBytes: fileBytes,
-                      filePath: imageFile,
-                    );
-                  });
-            },
-            child: Container(
-              margin: const EdgeInsets.only(left: 10),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFF71dd37),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.25),
-                    offset: const Offset(1, 1),
+          internProvider.currentIntern?.kehadiranHariIni == true
+              ? GestureDetector(
+                  onTap: () {
+                    showLogbookForm(
+                        context: context,
+                        onSubmit: (data, fileBytes, imageFile) {
+                          Provider.of<InternProvider>(context, listen: false)
+                              .submitLogbook(
+                            judul: data['judul'],
+                            category: data['category'],
+                            tanggal: data['tanggal'],
+                            mulai: data['mulai'],
+                            selesai: data['selesai'],
+                            petugas: data['petugas'],
+                            isi: data['isi'],
+                            keterangan: data['keterangan'],
+                            fileBytes: fileBytes,
+                            filePath: imageFile,
+                          );
+                        });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(left: 10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF71dd37),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.25),
+                          offset: const Offset(1, 1),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      'Tambah Jurnal',
+                      style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ],
-              ),
-              child: Text(
-                'Tambah Jurnal',
-                style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ) : const Divider(),
+                )
+              : const Divider(),
           Consumer<InternProvider>(
             builder: (context, provider, child) {
               final intern = provider.currentIntern;
@@ -363,108 +365,68 @@ class Pkl extends StatelessWidget {
               offset: const Offset(-1, -1))
         ],
       ),
-      child: Consumer<InternProvider>(
-        builder: (context, internProvider, child) {
-          return Column(
-                children: [
-                  Text(
-                    'Persentase Kehadiran',
-                    style:
-                        GoogleFonts.poppins(color: Colors.grey.shade700, fontSize: 18),
-                  ),
-                  StreamBuilder<String>(
-                    stream: Stream.periodic(const Duration(seconds: 1), (count) {
-                      DateTime now = DateTime.now();
-                      String tanggalHariIni =
-                          DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(now);
-                      String jamSekarang = DateFormat.jms('id_ID').format(now);
-                      return '$tanggalHariIni\n$jamSekarang';
-                    }),
-                    builder: (context, snapshot) {
-                      return Text(
-                        snapshot.data ?? '',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                            color: Colors.grey.shade700, fontSize: 18),
+      child:
+          Consumer<InternProvider>(builder: (context, internProvider, child) {
+        return Column(
+          children: [
+            Text(
+              'Persentase Kehadiran',
+              style: GoogleFonts.poppins(
+                  color: Colors.grey.shade700, fontSize: 18),
+            ),
+            StreamBuilder<String>(
+              stream: Stream.periodic(const Duration(seconds: 1), (count) {
+                DateTime now = DateTime.now();
+                String tanggalHariIni =
+                    DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(now);
+                String jamSekarang = DateFormat.jms('id_ID').format(now);
+                return '$tanggalHariIni\n$jamSekarang';
+              }),
+              builder: (context, snapshot) {
+                return Text(
+                  snapshot.data ?? '',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      color: Colors.grey.shade700, fontSize: 18),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            Image.asset(
+              'assets/images/3d-fluency-pencil-and-ruler.png',
+              height: 180,
+            ),
+            internProvider.canShowAttendanceButton
+                ? GestureDetector(
+                    onTap: () async {
+                      await showAttendancePopup(
+                        context: context,
+                        onSubmit: (String status, Uint8List? fileBytes,
+                            String? filePath) async {
+                          Provider.of<InternProvider>(context, listen: false)
+                              .submitAttendance(
+                                  keterangan: status,
+                                  fileBytes: fileBytes!,
+                                  filePath: filePath)
+                              .then((value) {
+                            internProvider.currentIntern?.kehadiranHariIni =
+                                true;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Absensi berhasil disimpan',
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.white, fontSize: 16),
+                                ),
+                                backgroundColor: Colors.green,
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                            internProvider.getInternSiswa();
+                          });
+                        },
                       );
                     },
-                  ),
-                  const SizedBox(height: 16),
-                  Image.asset(
-                    'assets/images/3d-fluency-pencil-and-ruler.png',
-                    height: 180,
-                  ),
-                  internProvider.canShowAttendanceButton
-                          ? GestureDetector(
-                              onTap: () {
-                                showAttendancePopup(
-                                  context: context,
-                                  onSubmit: (String status, Uint8List? fileBytes,
-                                      String? filePath) async {
-                                    Provider.of<InternProvider>(context, listen: false)
-                                        .submitAttendance(
-                                            keterangan: status,
-                                            fileBytes: fileBytes!,
-                                            filePath: filePath).then((value){
-                                              internProvider.currentIntern?.kehadiranHariIni = true;
-                                            });
-                                  },
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF71dd37),
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.25),
-                                      offset: const Offset(1, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: Text(
-                                  'Input Kehadiran',
-                                  style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            )
-                          : const Divider(
-                              thickness: 0,
-                              color: Colors.white,
-                            ),
-                  Text(
-                    '${internProvider.currentIntern?.presentaseKehadiran?.round() ?? 0}% Kehadiran ',
-                    style:
-                        GoogleFonts.poppins(color: Colors.grey.shade700, fontSize: 18),
-                  ),
-                  Text(
-                    'Hadir: ${internProvider.currentIntern?.detailKehadiran?.hadir} ',
-                    style:
-                        GoogleFonts.poppins(color: Colors.grey.shade700, fontSize: 18),
-                  ),
-                  Text(
-                    'Izin: ${internProvider.currentIntern?.detailKehadiran?.izin} ',
-                    style:
-                        GoogleFonts.poppins(color: Colors.grey.shade700, fontSize: 18),
-                  ),
-                  Text(
-                    'Sakit: ${internProvider.currentIntern?.detailKehadiran?.sakit} ',
-                    style:
-                        GoogleFonts.poppins(color: Colors.grey.shade700, fontSize: 18),
-                  ),
-                  Text(
-                    'Alpha: ${internProvider.currentIntern?.detailKehadiran?.alpha} ',
-                    style:
-                        GoogleFonts.poppins(color: Colors.grey.shade700, fontSize: 18),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  GestureDetector(
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -478,25 +440,93 @@ class Pkl extends StatelessWidget {
                         ],
                       ),
                       child: Text(
-                        'Lihat Detail Absensi',
+                        'Input Kehadiran',
                         style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 14,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
+                  )
+                : const Divider(
+                    thickness: 0,
+                    color: Colors.white,
                   ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Image.asset(
-                      'assets/images/pencil-rocket.png',
-                      height: 180,
+            Text(
+              '${internProvider.currentIntern?.presentaseKehadiran?.round() ?? 0}% Kehadiran ',
+              style: GoogleFonts.poppins(
+                  color: Colors.grey.shade700, fontSize: 18),
+            ),
+            Text(
+              'Hadir: ${internProvider.currentIntern?.detailKehadiran?.hadir} ',
+              style: GoogleFonts.poppins(
+                  color: Colors.grey.shade700, fontSize: 18),
+            ),
+            Text(
+              'Izin: ${internProvider.currentIntern?.detailKehadiran?.izin} ',
+              style: GoogleFonts.poppins(
+                  color: Colors.grey.shade700, fontSize: 18),
+            ),
+            Text(
+              'Sakit: ${internProvider.currentIntern?.detailKehadiran?.sakit} ',
+              style: GoogleFonts.poppins(
+                  color: Colors.grey.shade700, fontSize: 18),
+            ),
+            Text(
+              'Alpha: ${internProvider.currentIntern?.detailKehadiran?.alpha} ',
+              style: GoogleFonts.poppins(
+                  color: Colors.grey.shade700, fontSize: 18),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+              onTap: () async {
+                final siswaId = internProvider.currentIntern?.internship
+                    ?.studentId; // Ambil ID siswa dari objek siswa
+                debugPrint('ID yang dipilih: $siswaId');
+
+                // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => SiswaPklDetail(
+                      siswaId: siswaId,
                     ),
                   ),
-                ],
-          );
-        }
-      ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF71dd37),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.25),
+                      offset: const Offset(1, 1),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  'Lihat Detail Absensi',
+                  style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Image.asset(
+                'assets/images/pencil-rocket.png',
+                height: 180,
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

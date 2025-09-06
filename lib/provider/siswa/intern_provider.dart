@@ -29,6 +29,8 @@ class InternProvider extends BaseApi with ChangeNotifier {
         final responseData = json.decode(response.body);
         _currentIntern = InternshipModel.fromJson(responseData);
         notifyListeners();
+        debugPrint('Berhasil mendapatkan data internship siswa');
+        debugPrint('Data: ${response.body}');
       } else {
         debugPrint('Gagal mendapatkan data: ${response.statusCode}');
       }
@@ -47,7 +49,7 @@ class InternProvider extends BaseApi with ChangeNotifier {
     try {
       final uri = super.internPath;
       final request = http.MultipartRequest('POST', uri)
-        ..headers.addAll(super.getHeaders(tokenUser))
+        ..headers.addAll(super.getMultipartHeaders(tokenUser))
         ..fields['keterangan'] = keterangan;
 
       if (kIsWeb) {
@@ -77,8 +79,13 @@ class InternProvider extends BaseApi with ChangeNotifier {
       final response = await request.send();
       if (response.statusCode == 200 || response.statusCode == 201) {
         _currentIntern?.kehadiranHariIni = true;
+        final responseBody = await response.stream.bytesToString();
+        final responseData = json.decode(responseBody);
         notifyListeners();
         debugPrint('Berhasil submit absensi');
+        debugPrint('Response headers: ${response.headers}');
+        debugPrint('Response body: $responseBody');
+        debugPrint('Response data: $responseData');
       } else {
         debugPrint('Gagal submit absensi: ${response.statusCode}');
       }

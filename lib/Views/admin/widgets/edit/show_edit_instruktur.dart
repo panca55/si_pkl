@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/admin/instructors_model.dart';
 import 'package:si_pkl/models/admin/users_model.dart' as user;
 import 'package:si_pkl/models/admin/corporations_model.dart' as corporation;
@@ -18,7 +19,8 @@ Future<void> showEditInstrukturPopup(
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
-  final TextEditingController namaPerusahaanController = TextEditingController();
+  final TextEditingController namaPerusahaanController =
+      TextEditingController();
   final TextEditingController nipController = TextEditingController();
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController tempatLahirController = TextEditingController();
@@ -275,7 +277,7 @@ Future<void> showEditInstrukturPopup(
                         Align(
                             alignment: Alignment.centerLeft,
                             child: Image.network(
-                              'https://sigapkl-smkn2padang.com/storage/public/instructors-images/$fileName',
+                              '${BaseApi.base}/storage/public/instructors-images/$fileName',
                               height: 40,
                               width: 40,
                               errorBuilder: (context, error, stackTrace) =>
