@@ -48,16 +48,16 @@ Future<void> showAttendancePopup({
                 ),
                 const SizedBox(height: 16),
                 if (selectedStatus != null) ...[
-                  if (kIsWeb)
+                  if (selectedStatus == "IZIN" || selectedStatus == "SAKIT")
                     ElevatedButton(
                       onPressed: () async {
                         capturedImageBytes =
                             await ImagePickerWeb.getImageAsBytes();
                         setState(() {});
                       },
-                      child: const Text("Ambil Foto (Web)"),
+                      child: const Text("Upload dokumen"),
                     ),
-                  if (!kIsWeb)
+                  if (selectedStatus == "HADIR" )
                     SizedBox(
                       height: 200,
                       child: CameraPreview(cameraController!),
