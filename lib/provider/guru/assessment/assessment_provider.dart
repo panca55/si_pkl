@@ -15,12 +15,12 @@ class AssessmentProvider extends BaseApi with ChangeNotifier {
 
   Future<void> getAssessments() async {
     // final tokenUser = authController.authToken;
-    const tokenUser = '340|PtK7ZVsJUxGaO9i0e96koACk8m07CqZ1eMm4aqg496e10889';
+    final tokenUser = authController.authToken;
 
-    // if (tokenUser == null) {
-    //   debugPrint('Auth token is null. Please log in again.');
-    //   return;
-    // }
+    if (tokenUser == null) {
+      debugPrint('Auth token is null. Please log in again.');
+      return;
+    }
     try {
       http.Response response = await http.get(
         super.assessmentPath,
@@ -55,8 +55,8 @@ class AssessmentProvider extends BaseApi with ChangeNotifier {
       String? deskripsiPemahaman,
       String? deskripsiCatatan,
       }) async {
-    // final tokenUser = authController.authToken;
-    const tokenUser = '340|PtK7ZVsJUxGaO9i0e96koACk8m07CqZ1eMm4aqg496e10889';
+    final tokenUser = authController.authToken;
+    // const tokenUser = '340|PtK7ZVsJUxGaO9i0e96koACk8m07CqZ1eMm4aqg496e10889';
     try {
       final uri = super.postAssessmentPath(internshipId);
       final requestBody = {
