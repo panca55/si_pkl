@@ -1,7 +1,9 @@
-class BaseApi{
-  static var base =  "http://127.0.0.1:8000";
+class BaseApi {
+  // IP Address komputer di jaringan lokal untuk akses dari HP
+  // Sudah disesuaikan dengan IP address komputer: 192.168.1.6
+  static var base = "http://192.168.1.6:8000";
   static var api = "$base/api";
-  
+
   var authPath = Uri.parse("$api/login");
   var registerPath = Uri.parse("$api/register");
   var logoutPath = Uri.parse("$api/logout");
@@ -30,6 +32,8 @@ class BaseApi{
   var addStudentPath = Uri.parse("$api/student");
   var addProfileStudentPath = Uri.parse("$api/profil/siswa");
   var addProfileTeacherPath = Uri.parse("$api/teacher/profile");
+  var addProfileInstrukturPath = Uri.parse("$api/instruktur/profile");
+  var addProfileCorporatePath = Uri.parse("$api/instruktur/profile");
   var addInstrukturPath = Uri.parse("$api/instruktur");
   var addCorporatePath = Uri.parse("$api/korporat");
   var toggleActivePath = Uri.parse("$api/user/active");
@@ -41,6 +45,7 @@ class BaseApi{
   var corporationsPath = Uri.parse("$api/korporat");
   var evaluationsPath = Uri.parse("$api/admin/evaluation");
   var informationsPath = Uri.parse("$api/info");
+  var listinformationsPath = Uri.parse("$api/list-info");
   var internshipsPath = Uri.parse("$api/admin/intern");
   var instructorsPath = Uri.parse("$api/instruktur");
   var mayorsPath = Uri.parse("$api/mayor");
@@ -50,9 +55,15 @@ class BaseApi{
   var absentsPath = Uri.parse("$api/admin/intern/absen");
   static int? id;
 
+  Uri infoDetailPath(int? id) => Uri.parse("$api/info/$id");
   Uri siswaIndexPath(int? id) => Uri.parse("$api/pimpinan/siswa/$id");
   Uri editStudentPath(int? id) => Uri.parse("$api/student/$id");
   Uri editTeacherProfilePath(int? id) => Uri.parse("$api/teacher/profile/$id");
+  Uri editCorporateProfilePath(int? id) =>
+      Uri.parse("$api/korporat/profile/$id");
+  Uri editInstructoreProfilePath(int? id) =>
+      Uri.parse("$api/instruktur/profile/$id");
+
   Uri editMayorPath(int? id) => Uri.parse("$api/mayor/$id");
   Uri editUserPath(int? id) => Uri.parse("$api/users/$id");
   Uri deleteUserPath(int? id) => Uri.parse("$api/users/$id");
@@ -65,19 +76,27 @@ class BaseApi{
   Uri deleteCorporatePath(int? id) => Uri.parse("$api/korporat/$id");
   Uri editInstrukturPath(int? id) => Uri.parse("$api/instruktur/$id");
   Uri bimbinganIndexPath(int? id) => Uri.parse("$api/teacher/bimbingan/$id");
-  Uri bimbinganInstrukturIndexPath(int? id) => Uri.parse("$api/instruktur/bimbingan/$id");
-  Uri detailLogbookGuruPath(int? id) => Uri.parse("$api/teacher/bimbingan/logbook/$id");
-  Uri detailLogbookInstrukturPath(int? id) => Uri.parse("$api/instruktur/bimbingan/logbook/$id");
-  Uri editKomentarGuruPath(int? id) => Uri.parse("$api/teacher/bimbingan/update/$id");
-  Uri editKomentarInstrukturPath(int? id) => Uri.parse("$api/instruktur/bimbingan/update/$id");
-  Uri postAssessmentPath(int? id) => Uri.parse("$api/assessment?internship_id=$id");
+  Uri bimbinganInstrukturIndexPath(int? id) =>
+      Uri.parse("$api/instruktur/bimbingan/$id");
+  Uri detailLogbookGuruPath(int? id) =>
+      Uri.parse("$api/teacher/bimbingan/logbook/$id");
+  Uri detailLogbookInstrukturPath(int? id) =>
+      Uri.parse("$api/instruktur/bimbingan/logbook/$id");
+  Uri editKomentarGuruPath(int? id) =>
+      Uri.parse("$api/teacher/bimbingan/update/$id");
+  Uri editKomentarInstrukturPath(int? id) =>
+      Uri.parse("$api/instruktur/bimbingan/update/$id");
+  Uri postAssessmentPath(int? id) =>
+      Uri.parse("$api/assessment?internship_id=$id");
   Uri assessmentShowPath(int? id) => Uri.parse("$api/assessment/$id");
   Uri assessmentDetailPath(int? id) => Uri.parse("$api/assessment/detail/$id");
   Uri printAssessmentPath(int? id) => Uri.parse("$api/assessment/print/$id");
-  Uri printEvaluationPath(int? id) => Uri.parse("$api/teacher/evaluation/print/$id");
+  Uri printEvaluationPath(int? id) =>
+      Uri.parse("$api/teacher/evaluation/print/$id");
   Uri sertifikatDetailPath(int? id) => Uri.parse("$api/sertifikat/$id");
   Uri printSertifikatPath(int? id) => Uri.parse("$api/sertifikat/print/$id");
-  Uri penilaianDetailPath(int? id) => Uri.parse("$api/admin/evaluation/detail/$id");
+  Uri penilaianDetailPath(int? id) =>
+      Uri.parse("$api/admin/evaluation/detail/$id");
   Uri penilaianShowPath(int? id) => Uri.parse("$api/admin/evaluation/show/$id");
   var currentUserPath = Uri.parse("$api/user");
   String? token;
@@ -85,12 +104,13 @@ class BaseApi{
   void setToken(String newToken) {
     token = newToken;
   }
+
   // more routes
   Map<String, String> headers = {
     "Content-Type": "application/json",
     "Accept": "application/json",
-  };                            
-  
+  };
+
   Map<String, String> getHeaders(String? token) {
     if (token == null) {
       throw Exception("Token is null. Please log in first.");
@@ -99,7 +119,8 @@ class BaseApi{
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
     };
-  }                          
+  }
+
   Map<String, String> getMultipartHeaders(String? token) {
     if (token == null) {
       throw Exception("Token is null. Please log in first.");
@@ -109,5 +130,5 @@ class BaseApi{
       'Content-Type': 'multipart/form-data',
       'Accept': 'application/json',
     };
-  }                          
+  }
 }

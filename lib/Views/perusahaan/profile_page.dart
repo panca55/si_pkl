@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Views/perusahaan/edit_profile_page.dart';
 import 'package:si_pkl/models/perusahaan/profile_perusahaan_model.dart';
 import 'package:si_pkl/provider/perusahaan/profile_perusahaan_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
@@ -338,6 +339,9 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 20,
           ),
           GestureDetector(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return const EditProfilePage();
+            })),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               decoration: BoxDecoration(

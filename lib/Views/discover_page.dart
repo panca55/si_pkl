@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:si_pkl/Views/info_page.dart';
 import 'package:si_pkl/Views/login_page.dart';
 import 'package:si_pkl/Views/register_page.dart';
 
@@ -15,6 +16,28 @@ class DiscoverPage extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Expanded(child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  const InfoPage()));
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(top: 40, left: 20),
+                      alignment: Alignment.topLeft,
+                      child: const Icon(
+                        Icons.info_outline_rounded,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                    ),
+                  )
+                ],
+              )),
               Expanded(
                 child: Center(
                   child: SingleChildScrollView(
@@ -82,6 +105,7 @@ class DiscoverPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 40),
+                    
                     // Tombol Masuk dan Daftar
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -89,7 +113,7 @@ class DiscoverPage extends StatelessWidget {
                         // Tombol Masuk
                         OutlinedButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
+                            Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>

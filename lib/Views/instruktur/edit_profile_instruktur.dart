@@ -6,19 +6,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/guru/dashboard_side_guru.dart';
-import 'package:si_pkl/models/admin/corporations_model.dart';
 import 'package:si_pkl/provider/instruktur/profile_instruktur_provider.dart';
 
-class CreateProfileInstruktur extends StatefulWidget {
-  final List<Corporations>? perusahaan;
-  const CreateProfileInstruktur({super.key,required this.perusahaan });
+class EditProfileInstruktur extends StatefulWidget {
+  final int id;
+
+  const EditProfileInstruktur({
+    super.key,
+    required this.id,
+  });
 
   @override
-  State<CreateProfileInstruktur> createState() =>
-      _CreateProfileInstrukturState();
+  State<EditProfileInstruktur> createState() => _EditProfileInstrukturState();
 }
 
-class _CreateProfileInstrukturState extends State<CreateProfileInstruktur> {
+class _EditProfileInstrukturState extends State<EditProfileInstruktur> {
   final TextEditingController _nipController = TextEditingController();
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _golonganController = TextEditingController();
@@ -32,6 +34,64 @@ class _CreateProfileInstrukturState extends State<CreateProfileInstruktur> {
   final TextEditingController _alamatController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  String? selectedJenisKelamin;
+  int? selectedCorporationId;
+  DateTime? selectedDate;
+  Uint8List? fileBytes;
+  String? fileName;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _loadProfileData();
+      _loadInstrukturData();
+    });
+  }
+
+  Future<void> _loadProfileData() async {
+    final profileProvider =
+        Provider.of<ProfileInstrukturProvider>(context, listen: false);
+    try {
+      await profileProvider.getProfileguru();
+    } catch (e) {
+      debugPrint('Error loading profile data: $e');
+    }
+  }
+
+  void _loadInstrukturData() {
+    final profileProvider =
+        Provider.of<ProfileInstrukturProvider>(context, listen: false);
+    final instruktur = profileProvider.currentInstruktur?.profile;
+
+    if (instruktur != null) {
+      setState(() {
+        _nipController.text = instruktur.nip ?? '';
+        _namaController.text = instruktur.nama ?? '';
+        _tempatLahirController.text = instruktur.tempatLahir ?? '';
+        _alamatController.text = instruktur.alamat ?? '';
+        _noHpController.text = instruktur.hp ?? '';
+
+        // Set dropdown values
+        selectedJenisKelamin = instruktur.jenisKelamin;
+        selectedCorporationId =
+            instruktur.corporationId ?? 1; // Default to 1 if null
+
+        if (instruktur.tanggalLahir != null &&
+            instruktur.tanggalLahir!.isNotEmpty) {
+          try {
+            selectedDate = DateTime.parse(instruktur.tanggalLahir!);
+            _tanggalLahirController.text =
+                DateFormat('yyyy-MM-dd').format(selectedDate!);
+          } catch (e) {
+            debugPrint('Error parsing date: $e');
+          }
+        }
+      });
+    }
+  }
+
   @override
   void dispose() {
     _nipController.dispose();
@@ -52,7 +112,6 @@ class _CreateProfileInstrukturState extends State<CreateProfileInstruktur> {
   Widget build(BuildContext context) {
     final profileProvider =
         Provider.of<ProfileInstrukturProvider>(context, listen: false);
-    final corporate = widget.perusahaan?.toList() ?? [];
     Uint8List? fileBytes;
     String? fileName;
     Future<void> pickFile() async {
@@ -85,6 +144,7 @@ class _CreateProfileInstrukturState extends State<CreateProfileInstruktur> {
         debugPrint('File dipilih: $fileName');
       }
     }
+
     final int currentYear =
         int.parse(DateFormat('yyyy').format(DateTime.now()));
     const int startYear = 2000;
@@ -128,31 +188,6 @@ class _CreateProfileInstrukturState extends State<CreateProfileInstruktur> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<int>(
-                  isExpanded: true,
-                  decoration: const InputDecoration(
-                    labelText: "PERUSAHAAN",
-                    border: OutlineInputBorder(),
-                  ),
-                  items: corporate
-                      .map((corporate) => DropdownMenuItem<int>(
-                            value: corporate.id,
-                            child: Text(corporate.nama ?? ''),
-                          ))
-                      .toList(),
-                  value: selectedCorporationId,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedCorporationId = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Username harus dipilih';
-                    }
-                    return null;
-                  },
-                ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -366,21 +401,36 @@ class _CreateProfileInstrukturState extends State<CreateProfileInstruktur> {
                     debugPrint('data: ${data.entries.toList()}');
                     try {
                       if (formKey.currentState!.validate() &&
-                          selectedDate != null &&
-                          fileBytes != null) {
-                        await profileProvider.createProfile(
+                          selectedDate != null) {
+                        await profileProvider.editProfileInstruktur(
+                            id: widget.id,
                             data: data,
-                            fileBytes: fileBytes!,
-                            fileName: fileName!,
-                            filePath: fileName!);
+                            fileBytes: fileBytes,
+                            fileName: fileName,
+                            filePath: fileName);
                         // ignore: use_build_context_synchronously
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                               builder: (context) => const DashboardSideGuru()),
                         );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Silakan isi semua field dan pilih tanggal'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                       }
                     } catch (e) {
                       debugPrint('gagal menyimpan profile: $e');
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Gagal menyimpan profile: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
                   },
                   child: Container(

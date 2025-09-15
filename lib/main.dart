@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
         BimbinganDetail.routname: (context) => BimbinganDetail(
               bimbinganId: ModalRoute.of(context)?.settings.arguments as int,
             ),
+        
       },
     );
   }

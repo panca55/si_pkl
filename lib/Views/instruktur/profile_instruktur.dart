@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Services/base_api.dart';
+import 'package:si_pkl/Views/instruktur/edit_profile_instruktur.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/provider/instruktur/profile_instruktur_provider.dart';
 
@@ -155,6 +156,37 @@ class _ProfileInstrukturState extends State<ProfileInstruktur> {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      debugPrint('Edit Profile Tapped. ID: ${instruktur.id}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) => EditProfileInstruktur(
+                            id: instruktur.id!,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Edit Profile',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ),
                 ],
               ),
