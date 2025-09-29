@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:si_pkl/models/perusahaan/bursa_kerja_model.dart';
 import 'package:si_pkl/provider/perusahaan/bursa_kerja_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
+import 'package:si_pkl/Views/perusahaan/widgets/show_add_bursa_popup.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class BursaKerjaPage extends StatefulWidget {
@@ -15,77 +16,78 @@ class BursaKerjaPage extends StatefulWidget {
 }
 
 class _BursaKerjaPageState extends State<BursaKerjaPage> {
-  bool loading = true;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<BursaKerjaProvider>(context, listen: false).getBursaKerja();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bursaKerjaProvider =
-        Provider.of<BursaKerjaProvider>(context, listen: false);
-
     return Scaffold(
       backgroundColor: Colors.white,
-      body: FutureBuilder(
-        future: bursaKerjaProvider.getBursaKerja(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            loading = true;
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Terjadi kesalahan: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-          loading = false;
+      body: Consumer<BursaKerjaProvider>(
+        builder: (context, bursaKerjaProvider, _) {
           final bursaKerja =
               bursaKerjaProvider.bursaKerjaModel?.jobs?.toList() ?? [];
-          if (bursaKerjaProvider.bursaKerjaModel == null) {
-            return const SizedBox.shrink();
-          }
           return Padding(
             padding: const EdgeInsets.all(10),
-            child: Skeletonizer(
-              enabled: loading,
-              enableSwitchAnimation: true,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Lowongan Pekerjaan',
-                        style: GoogleFonts.poppins(
-                          color: Colors.grey.shade700,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Data Bursa Kerja',
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey.shade700,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
                       ),
-                      GestureDetector(
-                        onTap: () {},
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.indigo.shade700,
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  if (bursaKerja.isEmpty)
-                    const Center(
-                      child: Text(
-                        'Belum ada data siswa PKL.',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    ),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () async {
+                        await showAddBursaKerjaPopup(
+                          context: context,
+                          jenisPekerjaanOptions: bursaKerja.isNotEmpty
+                              ? bursaKerja
+                                  .map((job) => job.jenisPekerjaan ?? '')
+                                  .where((s) => s.isNotEmpty)
+                                  .toSet()
+                                  .toList()
+                              : ['Full Time', 'Part Time', 'Contract'],
+                          onSubmit: (data, fileBytes, fileName) async {
+                            await bursaKerjaProvider.createBursaKerja(
+                                data, fileBytes, fileName);
+                            // Refresh data after create
+                            await bursaKerjaProvider.getBursaKerja();
+                          },
+                        );
+                      },
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.indigo.shade700,
                       ),
-                    )
-                  else
-                    tabelBimbingan(bursaKerja)
-                ],
-              ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                if (bursaKerja.isEmpty)
+                  const Center(
+                    child: Text(
+                      'Belum ada data bursa kerja',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
+                else
+                  tabelBursaKerja(bursaKerja)
+              ],
             ),
           );
         },
@@ -93,7 +95,7 @@ class _BursaKerjaPageState extends State<BursaKerjaPage> {
     );
   }
 
-  Container tabelBimbingan(List<Job> bursaKerja) {
+  Container tabelBursaKerja(List<Job> bursaKerja) {
     String removeHtmlTags(String htmlString) {
       final RegExp exp =
           RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
@@ -150,7 +152,19 @@ class _BursaKerjaPageState extends State<BursaKerjaPage> {
               ),
               DataColumn(
                 label: Text(
+                  "Lokasi".toUpperCase(),
+                  style: GoogleFonts.poppins(color: Colors.black),
+                ),
+              ),
+              DataColumn(
+                label: Text(
                   "Rentang Gaji".toUpperCase(),
+                  style: GoogleFonts.poppins(color: Colors.black),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "Batas Pengiriman".toUpperCase(),
                   style: GoogleFonts.poppins(color: Colors.black),
                 ),
               ),
@@ -179,11 +193,13 @@ class _BursaKerjaPageState extends State<BursaKerjaPage> {
                     DataCell(
                         Text(removeHtmlTags(bursaKerjaData.deskripsi ?? '-'))),
                     DataCell(Text(bursaKerjaData.jenisPekerjaan ?? '-')),
+                    DataCell(Text(bursaKerjaData.lokasi ?? '-')),
                     DataCell(Text(NumberFormat.currency(
                       locale: 'id_ID', // Lokasi Indonesia
                       symbol: 'Rp',
                       decimalDigits: 0,
                     ).format(int.parse(bursaKerjaData.rentangGaji ?? '0')))),
+                    DataCell(Text(bursaKerjaData.batasPengiriman ?? '-')),
                     DataCell(bursaKerjaData.status == 1
                         ? Container(
                             padding: const EdgeInsets.all(4),
@@ -192,7 +208,7 @@ class _BursaKerjaPageState extends State<BursaKerjaPage> {
                               color: GlobalColorTheme.successColor,
                             ),
                             child: Text(
-                              'Aktf'.toUpperCase(),
+                              'Aktif'.toUpperCase(),
                               style: GoogleFonts.poppins(color: Colors.white),
                             ))
                         : Container(
@@ -202,7 +218,7 @@ class _BursaKerjaPageState extends State<BursaKerjaPage> {
                               color: GlobalColorTheme.errorColor,
                             ),
                             child: Text(
-                              'Tidak Aktf'.toUpperCase(),
+                              'Tidak Aktif'.toUpperCase(),
                               style: GoogleFonts.poppins(color: Colors.white),
                             ))),
                     DataCell(
@@ -244,20 +260,26 @@ class _BursaKerjaPageState extends State<BursaKerjaPage> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              // final bimbinganId = bursaKerjaData
-                              //     .id; // Ambil ID siswa dari objek siswa
-                              // debugPrint('ID yang dipilih: $bimbinganId');
-
-                              // // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute<void>(
-                              //     builder: (BuildContext context) =>
-                              //         BimbinganDetail(
-                              //       bimbinganId: bimbinganId,
-                              //     ),
-                              //   ),
-                              // );
+                              await showEditBursaKerjaPopup(
+                                context: context,
+                                job: bursaKerjaData,
+                                jenisPekerjaanOptions: bursaKerja.isNotEmpty
+                                    ? bursaKerja
+                                        .map((job) => job.jenisPekerjaan ?? '')
+                                        .where((s) => s.isNotEmpty)
+                                        .toSet()
+                                        .toList()
+                                    : ['Full Time', 'Part Time', 'Contract'],
+                                onSubmit: (data, fileBytes, fileName) async {
+                                  final provider =
+                                      Provider.of<BursaKerjaProvider>(context,
+                                          listen: false);
+                                  await provider.editBursaKerja(
+                                      data['id'], data, fileBytes, fileName);
+                                  // Refresh data after edit
+                                  await provider.getBursaKerja();
+                                },
+                              );
                             },
                             child: Container(
                               margin: const EdgeInsets.symmetric(
