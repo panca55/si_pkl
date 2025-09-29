@@ -12,7 +12,7 @@ Future<void> showEditTeacherPopup(
     required user.User? user,
     required BuildContext context,
     required Function(
-            Map<String, dynamic> data, Uint8List fileBytes, String? fileName)
+            Map<String, dynamic> data, Uint8List? fileBytes, String? fileName)
         onSubmit}) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
@@ -45,7 +45,7 @@ Future<void> showEditTeacherPopup(
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
+      firstDate: DateTime(1900),
       lastDate: DateTime(2100),
     );
     if (pickedDate != null) {
@@ -381,25 +381,36 @@ Future<void> showEditTeacherPopup(
                           const SizedBox(width: 10),
                           ElevatedButton(
                             onPressed: () {
+                              debugPrint(
+                                  'Validate: ${formKey.currentState!.validate()}');
                               if (formKey.currentState!.validate() &&
                                   selectedDate != null &&
-                                  fileBytes != null) {
+                                  (fileBytes != null || fileName != null)) {
+                                // Ubah kondisi agar fileBytes boleh null jika fileName ada (foto lama)
+                                debugPrint(
+                                    'Melakukan onSubmit dengan fileName: $fileName');
                                 onSubmit({
                                   "nip": nipController.text,
                                   "nama": nameController.text,
                                   "golongan": selectedGolongan,
                                   "bidang_studi": bidangStudiController.text,
-                                  "pendidikan_terakhir":
-                                      pendidikanTerakhirController.text,
+                                  "pendidikan_terakhir": pendidikanTerakhirController.text,
                                   "jabatan": jabatanController.text,
                                   "jenis_kelamin": selectedJenisKelamin,
-                                  "tanggal_lahir":
-                                      selectedDate?.toIso8601String(),
+                                  "tanggal_lahir": selectedDate?.toIso8601String(),
                                   "tempat_lahir": tempatLahirController.text,
                                   "alamat": alamatController.text,
                                   "hp": noHpController.text,
-                                }, fileBytes!, fileName);
+                                }, fileBytes, fileName);
                                 Navigator.of(context).pop();
+                              } else {
+                                debugPrint(
+                                    'Kondisi tidak terpenuhi: pastikan semua field diisi dan gambar dipilih atau foto lama ada');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Pastikan semua field diisi dan gambar dipilih atau foto lama ada')),
+                                );
                               }
                             },
                             child: Text("Simpan", style: GoogleFonts.poppins()),

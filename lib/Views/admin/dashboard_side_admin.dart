@@ -9,6 +9,8 @@ import 'package:si_pkl/Views/admin/information__table_page.dart';
 import 'package:si_pkl/Views/admin/instructors_table_page.dart';
 import 'package:si_pkl/Views/admin/jurusan_table_page.dart';
 import 'package:si_pkl/Views/admin/kelas_table_page.dart';
+import 'package:si_pkl/Views/admin/penilaian_table_page.dart';
+import 'package:si_pkl/Views/admin/pkl_table_page.dart';
 import 'package:si_pkl/Views/admin/students_table_page.dart';
 import 'package:si_pkl/Views/admin/teachers_table_page.dart';
 import 'package:si_pkl/Views/admin/users_table_page.dart';
@@ -35,6 +37,8 @@ class _DashboardSideAdminState extends State<DashboardSideAdmin> {
     'Instruktur': const InstructorsTablePage(),
     'Jurusan': const JurusanTablePage(),
     'Kelas': const KelasTablePage(),
+    'PKL': const PklTablePage(),
+    'Penilaian': const PenilaianTablePage(),
     'Informasi': const InformationTablePage(),
   };
 
@@ -173,6 +177,10 @@ class _DashboardSideAdminState extends State<DashboardSideAdmin> {
         return Icons.book;
       case 'Kelas':
         return Icons.pages;
+      case 'PKL':
+        return Icons.work;
+      case 'Penilaian':
+        return Icons.check_box;
       case 'Informasi':
         return Icons.info;
       default:

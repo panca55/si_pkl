@@ -169,7 +169,7 @@ class _EditProfileGuruState extends State<EditProfileGuru> {
       final DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: DateTime(1900),
         lastDate: DateTime(2100),
       );
       if (pickedDate != null) {
@@ -586,7 +586,8 @@ class _EditProfileGuruState extends State<EditProfileGuru> {
                           ),
                         );
                         // ignore: use_build_context_synchronously
-                        Navigator.pop(context);
+                        Navigator.pop(
+                            context, true); // Return true to indicate success
                       }
                     } catch (e) {
                       debugPrint('gagal menyimpan profile: $e');

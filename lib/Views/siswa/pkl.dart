@@ -5,12 +5,53 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/pimpinan/siswa_pkl_detail.dart';
+import 'package:si_pkl/Views/siswa/widgets/show_edit_logbook_form.dart';
 import 'package:si_pkl/provider/siswa/intern_provider.dart';
 import 'package:si_pkl/Views/siswa/widgets/show_logbook_form.dart';
 import 'package:si_pkl/Views/siswa/widgets/show_attendance_popup.dart';
 
-class Pkl extends StatelessWidget {
+class Pkl extends StatefulWidget {
   const Pkl({super.key});
+
+  @override
+  State<Pkl> createState() => _PklState();
+}
+
+class _PklState extends State<Pkl> with RouteAware {
+  late Future<void> _dataFuture;
+  final RouteObserver<ModalRoute<void>> routeObserver =
+      RouteObserver<ModalRoute<void>>();
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when returning to this page
+    _refreshData();
+  }
+
+  void _refreshData() {
+    setState(() {
+      _dataFuture =
+          Provider.of<InternProvider>(context, listen: false).getInternSiswa();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +60,7 @@ class Pkl extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder(
-        future: internProvider.getInternSiswa(),
+        future: _dataFuture,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             // Tampilkan pesan error jika terjadi kesalahan
@@ -114,20 +155,32 @@ class Pkl extends StatelessWidget {
                   onTap: () {
                     showLogbookForm(
                         context: context,
-                        onSubmit: (data, fileBytes, imageFile) {
-                          Provider.of<InternProvider>(context, listen: false)
-                              .submitLogbook(
-                            judul: data['judul'],
-                            category: data['category'],
-                            tanggal: data['tanggal'],
-                            mulai: data['mulai'],
-                            selesai: data['selesai'],
-                            petugas: data['petugas'],
-                            isi: data['isi'],
-                            keterangan: data['keterangan'],
-                            fileBytes: fileBytes,
-                            filePath: imageFile,
-                          );
+                        onSubmit: (data, fileBytes, imageFile) async {
+                          try {
+                            await Provider.of<InternProvider>(context,
+                                    listen: false)
+                                .submitLogbook(
+                              judul: data['judul'],
+                              category: data['category'],
+                              bentukKegiatan: data['bentuk_kegiatan'],
+                              penugasanPekerjaan: data['penugasan_pekerjaan'],
+                              tanggal: data['tanggal'],
+                              mulai: data['mulai'],
+                              selesai: data['selesai'],
+                              petugas: data['petugas'],
+                              isi: data['isi'],
+                              keterangan: data['keterangan'],
+                              fileBytes: fileBytes,
+                              filePath: imageFile,
+                            );
+                            // Refresh data after successful submission
+                            _refreshData();
+                          } catch (e) {
+                            // Refresh data even if submission failed
+                            _refreshData();
+                            // Re-throw to let the form handle the error display
+                            rethrow;
+                          }
                         });
                   },
                   child: Container(
@@ -229,7 +282,61 @@ class Pkl extends StatelessWidget {
                               Row(
                                 children: [
                                   GestureDetector(
-                                    onTap: () {},
+                                    onTap: () {
+                                      // Aksi untuk tombol edit
+                                      showEditLogbookForm(
+                                        context: context,
+                                        id: logbook.id!,
+                                        onSubmit:
+                                            (data, fileBytes, fileName) async {
+                                          debugPrint(
+                                              'Form data being submitted: $data');
+                                          try {
+                                            await Provider.of<InternProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .editLogbook(
+                                              id: logbook.id!,
+                                              judul: data['judul'],
+                                              category: data['category'],
+                                              bentukKegiatan:
+                                                  data['bentuk_kegiatan'],
+                                              penugasanPekerjaan:
+                                                  data['penugasan_pekerjaan'],
+                                              tanggal: data['tanggal'],
+                                              mulai: data['mulai'],
+                                              selesai: data['selesai'],
+                                              petugas: data['petugas'],
+                                              isi: data['isi'],
+                                              keterangan: data['keterangan'],
+                                              fileBytes: fileBytes,
+                                              filePath: fileName,
+                                            );
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'Logbook berhasil diedit'),
+                                                backgroundColor: Colors.green,
+                                              ),
+                                            );
+                                            // Refresh data after successful edit
+                                            _refreshData();
+                                          } catch (e) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Gagal edit logbook: $e'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            // Refresh data even if edit failed
+                                            _refreshData();
+                                          }
+                                        },
+                                      );
+                                    },
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 5, horizontal: 5),
@@ -246,7 +353,80 @@ class Pkl extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   GestureDetector(
-                                    onTap: () {},
+                                    onTap: () {
+                                      // Aksi untuk tombol delete
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                              'Hapus Jurnal',
+                                              style: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            content: Text(
+                                              'Apakah Anda yakin ingin menghapus jurnal ini?',
+                                              style: GoogleFonts.poppins(),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                child: Text(
+                                                  'Batal',
+                                                  style: GoogleFonts.poppins(
+                                                      color: Colors.grey),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                                onPressed: () async {
+                                                  try {
+                                                    await Provider.of<
+                                                                InternProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .deleteLogbook(
+                                                            id: logbook.id!);
+                                                    Navigator.of(context).pop();
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Logbook berhasil dihapus'),
+                                                        backgroundColor:
+                                                            Colors.green,
+                                                      ),
+                                                    );
+                                                  } catch (e) {
+                                                    Navigator.of(context).pop();
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            'Gagal hapus logbook: $e'),
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                                child: Text(
+                                                  'Hapus',
+                                                  style: GoogleFonts.poppins(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 5, horizontal: 5),
@@ -403,12 +583,13 @@ class Pkl extends StatelessWidget {
                         context: context,
                         onSubmit: (String status, Uint8List? fileBytes,
                             String? filePath) async {
-                          Provider.of<InternProvider>(context, listen: false)
-                              .submitAttendance(
-                                  keterangan: status,
-                                  fileBytes: fileBytes!,
-                                  filePath: filePath)
-                              .then((value) {
+                          try {
+                            await Provider.of<InternProvider>(context,
+                                    listen: false)
+                                .submitAttendance(
+                                    keterangan: status,
+                                    fileBytes: fileBytes!,
+                                    filePath: filePath);
                             internProvider.currentIntern?.kehadiranHariIni =
                                 true;
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -422,8 +603,23 @@ class Pkl extends StatelessWidget {
                                 duration: const Duration(seconds: 3),
                               ),
                             );
-                            internProvider.getInternSiswa();
-                          });
+                            // Refresh data after successful attendance
+                            _refreshData();
+                          } catch (e) {
+                            // Refresh data even if attendance failed
+                            _refreshData();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Gagal menyimpan absensi: $e',
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.white, fontSize: 16),
+                                ),
+                                backgroundColor: Colors.red,
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                          }
                         },
                       );
                     },

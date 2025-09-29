@@ -16,7 +16,7 @@ Future<void> showEditStudentPopup(
     required mayor.Mayor kelas,
     required BuildContext context,
     required Function(
-            Map<String, dynamic> data, Uint8List fileBytes, String? fileName)
+            Map<String, dynamic> data, Uint8List? fileBytes, String? fileName)
         onSubmit}) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
@@ -60,7 +60,7 @@ Future<void> showEditStudentPopup(
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
+      firstDate: DateTime(1900),
       lastDate: DateTime(2100),
     );
     if (pickedDate != null) {
@@ -420,7 +420,7 @@ Future<void> showEditStudentPopup(
                                   "alamat_ortu": alamatOrtuController.text,
                                   "hp_siswa": noHpSiswaController.text,
                                   "hp_ortu": noHpOrtuController.text,
-                                }, fileBytes!, fileName);
+                                }, fileBytes, fileName);
                                 Navigator.of(context).pop();
                               }
                             },

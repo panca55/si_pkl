@@ -5,17 +5,26 @@ class EvaluationsModel {
   EvaluationsModel({this.internship, this.evaluations, this.evaluationsDates});
 
   factory EvaluationsModel.fromJson(Map<String, dynamic> json) {
+    final dates = json['evaluationDates'] != null
+        ? List<EvaluationDates>.from(json['evaluationDates'].map(
+                (evaluationDate) => EvaluationDates.fromJson(evaluationDate)))
+            .cast<EvaluationDates>()
+        : <EvaluationDates>[];
     return EvaluationsModel(
-      internship: List<Internship>.from(json['internships']
-          .map((internship) => Internship.fromJson(internship))),
-      evaluations: List<Evaluations>.from(json['evaluations']
-          .map((evaluation) => Evaluations.fromJson(evaluation))),
-      evaluationsDates: List<EvaluationDates>.from(json['evaluation_dates']
-          .map((evaluationDate) => EvaluationDates.fromJson(evaluationDate))),
+      internship: json['internships'] != null
+          ? List<Internship>.from(json['internships']
+              .map((internship) => Internship.fromJson(internship)))
+          : [],
+      evaluations: json['evaluations'] != null
+          ? List<Evaluations>.from(json['evaluations']
+              .map((evaluation) => Evaluations.fromJson(evaluation)))
+          : [],
+      evaluationsDates: dates,
     );
   }
 }
-class Evaluations{
+
+class Evaluations {
   int? id;
   int? internshipId;
   int? monitoring;
@@ -25,7 +34,16 @@ class Evaluations{
   int? nilaiAkhir;
   String? createdAt;
   String? updatedAt;
-  Evaluations({this.id, this.internshipId, this.monitoring, this.sertifikat, this.logbook, this.presentasi, this.nilaiAkhir, this.createdAt, this.updatedAt});
+  Evaluations(
+      {this.id,
+      this.internshipId,
+      this.monitoring,
+      this.sertifikat,
+      this.logbook,
+      this.presentasi,
+      this.nilaiAkhir,
+      this.createdAt,
+      this.updatedAt});
   factory Evaluations.fromJson(Map<String, dynamic> json) {
     return Evaluations(
       id: json['id'] as int,
@@ -40,23 +58,33 @@ class Evaluations{
     );
   }
 }
-class EvaluationDates{
+
+class EvaluationDates {
   int? id;
   DateTime? startDate;
   DateTime? endDate;
   DateTime? createdAt;
   DateTime? updatedAt;
-  EvaluationDates({this.id, this.startDate, this.endDate, this.createdAt, this.updatedAt});
+  EvaluationDates(
+      {this.id, this.startDate, this.endDate, this.createdAt, this.updatedAt});
   factory EvaluationDates.fromJson(Map<String, dynamic> json) {
     return EvaluationDates(
-      id: json['id'] as int,
-      startDate: json['start_date'] as DateTime,
-      endDate: json['end_date'] as DateTime,
-      createdAt: json['created_at'] as DateTime,
-      updatedAt: json['updated_at'] as DateTime,
+      id: json['id'] as int?,
+      startDate: json['start_date'] != null
+          ? DateTime.tryParse(json['start_date'])
+          : null,
+      endDate:
+          json['end_date'] != null ? DateTime.tryParse(json['end_date']) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'])
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'])
+          : null,
     );
   }
 }
+
 class Internship {
   int? id;
   int? studentId;
@@ -109,12 +137,10 @@ class Internship {
       status: json['status'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      student: json['student'] != null
-          ? Student.fromJson(json['student'])
-          : null,
-      teacher: json['teacher'] != null
-          ? Teacher.fromJson(json['teacher'])
-          : null,
+      student:
+          json['student'] != null ? Student.fromJson(json['student']) : null,
+      teacher:
+          json['teacher'] != null ? Teacher.fromJson(json['teacher']) : null,
       corporation: json['corporation'] != null
           ? Corporation.fromJson(json['corporation'])
           : null,
@@ -130,6 +156,7 @@ class Internship {
     );
   }
 }
+
 class Evaluation {
   int? id;
   int? internshipId;
@@ -167,6 +194,7 @@ class Evaluation {
     );
   }
 }
+
 class Assessment {
   int? id;
   int? internshipId;
@@ -225,6 +253,7 @@ class Assessment {
     );
   }
 }
+
 class Teacher {
   Teacher({
     this.id,
@@ -300,6 +329,7 @@ class Teacher {
         "updated_at": updatedAt?.toIso8601String(),
       };
 }
+
 class Certificate {
   int? id;
   int? internshipId;
@@ -340,27 +370,29 @@ class Certificate {
     );
   }
 }
+
 class Student {
-  Student(
-      {this.id,
-      this.userId,
-      this.mayorId,
-      this.nisn,
-      this.nama,
-      this.konsentrasi,
-      this.tahunMasuk,
-      this.jenisKelamin,
-      this.statusPkl,
-      this.tempatLahir,
-      this.tanggalLahir,
-      this.alamatSiswa,
-      this.alamatOrtu,
-      this.hpSiswa,
-      this.hpOrtu,
-      this.foto,
-      this.mayor,
-      this.createdAt,
-      this.updatedAt,});
+  Student({
+    this.id,
+    this.userId,
+    this.mayorId,
+    this.nisn,
+    this.nama,
+    this.konsentrasi,
+    this.tahunMasuk,
+    this.jenisKelamin,
+    this.statusPkl,
+    this.tempatLahir,
+    this.tanggalLahir,
+    this.alamatSiswa,
+    this.alamatOrtu,
+    this.hpSiswa,
+    this.hpOrtu,
+    this.foto,
+    this.mayor,
+    this.createdAt,
+    this.updatedAt,
+  });
   int? id;
   int? userId;
   int? mayorId;
@@ -476,6 +508,7 @@ class Department {
         "updated_at": updatedAt?.toIso8601String(),
       };
 }
+
 class Corporation {
   int? id;
   int? userId;

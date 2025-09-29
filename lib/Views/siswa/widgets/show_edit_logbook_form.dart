@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:si_pkl/provider/siswa/intern_provider.dart';
 import 'dart:typed_data';
 
-Future<void> showLogbookForm({
+Future<void> showEditLogbookForm({
+  required int id,
   required BuildContext context,
   required Function(
-          Map<String, dynamic> data, Uint8List fileBytes, String? fileName)
+          Map<String, dynamic> data, Uint8List? fileBytes, String? fileName)
       onSubmit,
 }) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -24,6 +27,43 @@ Future<void> showLogbookForm({
   Uint8List? fileBytes;
   String? fileName;
   String? fileError;
+
+  // Fetch existing logbook data
+  final internProvider = Provider.of<InternProvider>(context, listen: false);
+  final existingLogbook = internProvider.currentIntern?.logbook?.firstWhere(
+    (logbook) => logbook.id == id,
+    orElse: () => throw Exception('Logbook not found'),
+  );
+
+  if (existingLogbook != null) {
+    titleController.text = existingLogbook.judul ?? '';
+    officerController.text = existingLogbook.petugas ?? '';
+    contentController.text = existingLogbook.isi ?? '';
+    selectedCategory = existingLogbook.category;
+    selectedStatus = existingLogbook.keterangan;
+    selectedDate = DateTime.parse(
+        existingLogbook.tanggal ?? DateTime.now().toIso8601String());
+    if (existingLogbook.mulai != null) {
+      final startParts = existingLogbook.mulai!.split(':');
+      selectedStartTime = TimeOfDay(
+          hour: int.parse(startParts[0]), minute: int.parse(startParts[1]));
+    }
+    if (existingLogbook.selesai != null) {
+      final endParts = existingLogbook.selesai!.split(':');
+      selectedEndTime = TimeOfDay(
+          hour: int.parse(endParts[0]), minute: int.parse(endParts[1]));
+    }
+    // For bentuk_kegiatan or penugasan_pekerjaan, assume it's stored in the model or set based on category
+    // If category is KOMPETENSI, set selectedBentukKegiatan, else selectedPenugasanPekerjaan
+    if (selectedCategory == "KOMPETENSI") {
+      selectedBentukKegiatan =
+          existingLogbook.bentukKegiatan ?? "MANDIRI"; // Default or from model
+    } else if (selectedCategory == "LAINNYA") {
+      selectedPenugasanPekerjaan = existingLogbook.penugasanPekerjaan ??
+          "DITUGASKAN"; // Default or from model
+    }
+    // Note: fileBytes and fileName are not pre-filled as editing file might be optional
+  }
 
   Future<void> pickTime(BuildContext context, bool isStartTime) async {
     final TimeOfDay? pickedTime = await showTimePicker(
@@ -504,7 +544,6 @@ Future<void> showLogbookForm({
                               if (formKey.currentState!.validate() &&
                                   selectedStartTime != null &&
                                   selectedEndTime != null &&
-                                  fileBytes != null &&
                                   fileError == null) {
                                 onSubmit({
                                   "judul": titleController.text,
@@ -522,8 +561,25 @@ Future<void> showLogbookForm({
                                   "petugas": officerController.text,
                                   "isi": contentController.text,
                                   "keterangan": selectedStatus,
-                                }, fileBytes!, fileName);
+                                }, fileBytes, fileName);
                                 Navigator.of(context).pop();
+                              } else {
+                                // Feedback jika gagal
+                                String errorMessage =
+                                    "Harap lengkapi semua field yang diperlukan.";
+                                if (selectedStartTime == null) {
+                                  errorMessage = "Pilih waktu mulai.";
+                                } else if (selectedEndTime == null) {
+                                  errorMessage = "Pilih waktu selesai.";
+                                } else if (fileError != null) {
+                                  errorMessage = fileError!;
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(errorMessage),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
                               }
                             },
                             style: ElevatedButton.styleFrom(

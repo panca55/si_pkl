@@ -66,7 +66,8 @@ class InformationsProvider extends BaseApi with ChangeNotifier {
       if (response.statusCode == 200) {
         debugPrint('Berhasil mendapatkan data: ${response.statusCode}');
         final responseData = json.decode(response.body);
-        _informationsModel = InformationsModel.fromJson(responseData);
+        _information =
+            (responseData as List).map((e) => Information.fromJson(e)).toList();
         _safeNotifyListeners();
         debugPrint('Data berhasil di-parse: $_informationsModel');
         debugPrint('respon data: $responseData');

@@ -166,7 +166,7 @@ class InstructorsProvider extends BaseApi with ChangeNotifier {
       }
 
       // Menyiapkan request dengan 'Content-Type' application/json
-      final response = await http.put(
+      final response = await http.post(
         uri,
         headers: {
           'Authorization': 'Bearer $tokenUser',

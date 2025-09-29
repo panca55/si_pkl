@@ -1,7 +1,7 @@
 class BaseApi {
   // IP Address komputer di jaringan lokal untuk akses dari HP
   // Sudah disesuaikan dengan IP address komputer: 192.168.1.6
-  static var base = "http://192.168.1.6:8000";
+  static var base = "http://127.0.0.1:8000";
   static var api = "$base/api";
 
   var authPath = Uri.parse("$api/login");
@@ -44,7 +44,7 @@ class BaseApi {
   var departmentsPath = Uri.parse("$api/department");
   var corporationsPath = Uri.parse("$api/korporat");
   var evaluationsPath = Uri.parse("$api/admin/evaluation");
-  var informationsPath = Uri.parse("$api/info");
+  var informationsPath = Uri.parse("$api/list-info");
   var listinformationsPath = Uri.parse("$api/list-info");
   var internshipsPath = Uri.parse("$api/admin/intern");
   var instructorsPath = Uri.parse("$api/instruktur");
@@ -64,6 +64,8 @@ class BaseApi {
   Uri editInstructoreProfilePath(int? id) =>
       Uri.parse("$api/instruktur/profile/$id");
 
+  Uri editLogbookPath(int? id) => Uri.parse("$api/student/internship/logbook/$id");
+  Uri deleteLogbookPath(int? id) => Uri.parse("$api/student/internship/logbook/$id");
   Uri editMayorPath(int? id) => Uri.parse("$api/mayor/$id");
   Uri editUserPath(int? id) => Uri.parse("$api/users/$id");
   Uri deleteUserPath(int? id) => Uri.parse("$api/users/$id");

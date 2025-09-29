@@ -16,7 +16,9 @@ class DiscoverPage extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Row(
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Row(
                 children: [
                   GestureDetector(
                     onTap: () {
@@ -27,12 +29,41 @@ class DiscoverPage extends StatelessWidget {
                                   const InfoPage()));
                     },
                     child: Container(
-                      padding: const EdgeInsets.only(top: 40, left: 20),
+                      // width and height fit to content
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(20),
+
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12.withOpacity(0.05),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      margin: const EdgeInsets.only(top: 40, left: 20),
                       alignment: Alignment.topLeft,
-                      child: const Icon(
-                        Icons.info_outline_rounded,
-                        color: Colors.black,
-                        size: 30,
+                      child: Row(
+                        spacing: 10,
+                        children: [
+                          const Icon(
+                            Icons.info_outline_rounded,
+                            color: Colors.black,
+                            size: 30,
+                          ),
+                          const Text(
+                            'Informasi PKL',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   )

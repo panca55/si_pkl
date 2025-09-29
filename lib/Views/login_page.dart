@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +69,9 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 20),
+          padding: EdgeInsets.symmetric(vertical: 20).copyWith(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
           color: Colors.white,
           child: Column(
             children: [
@@ -166,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         TextFormField(
                           controller: _passwordController,
-                          obscureText: true,
+                          obscureText: !_isPasswordVisible,
                           decoration: InputDecoration(
                             hintText: 'Masukkan Password',
                             border: OutlineInputBorder(
@@ -177,6 +180,19 @@ class _LoginPageState extends State<LoginPage> {
                               fontSize: 12,
                             ),
                             fillColor: Colors.white,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
                           ),
                         ),
                         const SizedBox(

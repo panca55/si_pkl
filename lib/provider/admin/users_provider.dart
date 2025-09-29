@@ -173,6 +173,7 @@ class UsersProvider extends BaseApi with ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('Berhasil menghapus data user:');
         _user.removeWhere((user) => user.id == id);
+        await getUsers();
         notifyListeners();
       } else {
         debugPrint('Gagal menghapus data user:: ${response.statusCode}');

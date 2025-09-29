@@ -54,7 +54,9 @@ class SiswaIndexModel {
       logbook: json['logbook'] != null
           ? List<Logbook>.from(json['logbook'].map((x) => Logbook.fromJson(x)))
           : null,
-      evaluation: json['evaluation'],
+      evaluation: json['evaluation'] != null
+          ? Evaluation.fromJson(json['evaluation'])
+          : null,
       certificate: json['certificate'],
       assessment: json['assessment'] != null
           ? List<Assessment>.from(
@@ -256,7 +258,6 @@ class Instructor {
     );
   }
 }
-
 
 class Logbook {
   int? id;

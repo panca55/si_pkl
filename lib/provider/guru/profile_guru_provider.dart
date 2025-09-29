@@ -21,6 +21,11 @@ class ProfileGuruProvider extends BaseApi with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> refreshProfile() async {
+    clearProfileData();
+    await getProfileguru();
+  }
+
   Future<void> getProfileguru() async {
     final tokenUser = authController.authToken;
     try {

@@ -7,15 +7,32 @@ import 'package:si_pkl/models/pimpinan/siswa_index_model.dart';
 import 'package:si_pkl/provider/pimpinan/siswa_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
 
-class SiswaPklDetail extends StatelessWidget {
+class SiswaPklDetail extends StatefulWidget {
   static const String routname = '/siswa-pkl-detail';
   final int? siswaId;
   const SiswaPklDetail({super.key, required this.siswaId});
 
   @override
+  State<SiswaPklDetail> createState() => _SiswaPklDetailState();
+}
+
+class _SiswaPklDetailState extends State<SiswaPklDetail> {
+  Future? _siswaFuture;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refetch data every time dependencies change (page revisit)
+    if (widget.siswaId != null) {
+      _siswaFuture = Provider.of<SiswaProvider>(context, listen: false)
+          .getIndexSiswa(id: widget.siswaId!);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (siswaId == null) {
-      debugPrint('ID Siswa = $siswaId / tidak ditemukan');
+    if (widget.siswaId == null) {
+      debugPrint('ID Siswa = ${widget.siswaId} / tidak ditemukan');
       return const Scaffold(
         backgroundColor: Colors.white,
         body: Center(
@@ -23,13 +40,22 @@ class SiswaPklDetail extends StatelessWidget {
         ),
       );
     }
-    debugPrint('ID yang terpilih: $siswaId');
+    debugPrint('ID yang terpilih: ${widget.siswaId}');
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text('Detail Siswa',
+            style: GoogleFonts.poppins(color: Colors.black)),
+      ),
       body: FutureBuilder(
-          future: Provider.of<SiswaProvider>(context, listen: false)
-              .getIndexSiswa(id: siswaId!),
+          future: _siswaFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -44,7 +70,11 @@ class SiswaPklDetail extends StatelessWidget {
             }
             final siswa =
                 Provider.of<SiswaProvider>(context, listen: false).siswa;
-            debugPrint('Persentase hadir: ${siswa?.attendance?.percentage}');
+            if (siswa == null || siswa.student == null) {
+              return const Center(
+                  child: Text('Data siswa tidak ditemukan atau belum lengkap'));
+            }
+            debugPrint('Persentase hadir: ${siswa.attendance?.percentage}');
             return SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -54,7 +84,7 @@ class SiswaPklDetail extends StatelessWidget {
                     image:
                         'http://localhost:8000/storage/public/teachers-images/indah_1732989878.png',
                     colorHeader: GlobalColorTheme.primaryBlueColor,
-                    title: siswa!.student!.nama!,
+                    title: siswa.student?.nama ?? '-',
                     property1: 'Email',
                     value1: siswa.student?.user?.email,
                     property2: 'Tanggal Mulai',
@@ -64,9 +94,7 @@ class SiswaPklDetail extends StatelessWidget {
                     property4: 'Status PKL',
                     value4: siswa.status,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   _buildAttendanceCard(
                     context: context,
                     colorHeader: GlobalColorTheme.successColor,
@@ -81,22 +109,46 @@ class SiswaPklDetail extends StatelessWidget {
                     value4: siswa.attendance?.alpha,
                     percentage: siswa.attendance?.percentage?.toDouble(),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  _buildLogbookCard(
-                      colorHeader: Colors.amber,
-                      title: 'Logbook',
-                      logbookList: siswa.logbook!,
-                      context: context),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
+                  if (siswa.logbook != null)
+                    _buildLogbookCard(
+                        colorHeader: Colors.amber,
+                        title: 'Logbook',
+                        logbookList: siswa.logbook!,
+                        context: context),
+                  const SizedBox(height: 10),
                   _buildEvaluationCard(
                       colorHeader: GlobalColorTheme.errorColor,
                       title: "Penilaian Akhir Siswa",
                       context: context,
-                      evaluation: siswa.evaluation)
+                      evaluation: siswa.evaluation),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.center,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        height: 40,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: GlobalColorTheme.primaryBlueColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Kembali',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             );
@@ -504,6 +556,7 @@ class SiswaPklDetail extends StatelessWidget {
                 TableRow(children: [
                   TableCell(
                       child: Text('Nilai Akhir', style: GoogleFonts.poppins())),
+                  TableCell(child: Text('', style: GoogleFonts.poppins())),
                   TableCell(
                       child: Text(evaluation.nilaiAkhir.toString(),
                           style: GoogleFonts.poppins())),

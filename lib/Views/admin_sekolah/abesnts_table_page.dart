@@ -13,6 +13,23 @@ class AbesntsTablePage extends StatelessWidget {
         Provider.of<AbsentsProvider>(context, listen: false);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Data Absensi Siswa',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       backgroundColor: Colors.white,
       body: FutureBuilder(
         future: absentsProvider.getCorporations(),
@@ -32,17 +49,6 @@ class AbesntsTablePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Data Absensi Siswa',
-                  style: GoogleFonts.poppins(
-                    color: Colors.grey.shade700,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
                 Consumer<AbsentsProvider?>(
                   builder: (context, provider, child) {
                     final absent = provider?.absentsModel?.data ?? [];

@@ -10,11 +10,10 @@ import 'package:universal_io/io.dart' as universal_io;
 class TeachersProvider extends BaseApi with ChangeNotifier {
   TeachersModel? _teachersModel;
   TeachersModel? get teachersModel => _teachersModel;
-  final List<Teacher> _teacher =[];
+  final List<Teacher> _teacher = [];
   List<Teacher> get teacher => _teacher;
   final AuthController authController;
   TeachersProvider({required this.authController});
-
 
   Future<void> deleteUser({
     required int id,
@@ -46,6 +45,7 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
       debugPrint('Error menghapus data user:: $e');
     }
   }
+
   Future<void> getTeachers() async {
     final tokenUser = authController.authToken;
 
@@ -74,12 +74,11 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
     }
   }
 
-  Future<void> addTeacher({
-    required Map<String, dynamic> data,
-    required Uint8List? fileBytes,
-    String? filePath,
-    String? fileName
-  }) async {
+  Future<void> addTeacher(
+      {required Map<String, dynamic> data,
+      required Uint8List? fileBytes,
+      String? filePath,
+      String? fileName}) async {
     final tokenUser = authController.authToken;
     try {
       final uri = super.addTeacherPath;
@@ -93,7 +92,7 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
         }
       });
       if (fileBytes != null && fileName != null) {
-        if (kIsWeb){
+        if (kIsWeb) {
           request.files.add(
             http.MultipartFile.fromBytes(
               'foto',
@@ -102,10 +101,9 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
               contentType: MediaType('image', fileName.split('.').last),
             ),
           );
-          
-        }else if(universal_io.Platform.isAndroid ||
-            universal_io.Platform.isIOS){
-              request.files.add(
+        } else if (universal_io.Platform.isAndroid ||
+            universal_io.Platform.isIOS) {
+          request.files.add(
             await http.MultipartFile.fromPath(
               'foto',
               filePath!,
@@ -113,7 +111,7 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
               contentType: MediaType('image', fileName.split('.').last),
             ),
           );
-            }
+        }
       }
 
       debugPrint('Request Body: ${jsonEncode(data)}');
@@ -137,7 +135,7 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
       debugPrint('Error submitKomentar: $e');
     }
   }
-  
+
   Future<void> editTeacher({
     required int id,
     required Map<String, dynamic> data,
@@ -148,57 +146,72 @@ class TeachersProvider extends BaseApi with ChangeNotifier {
     try {
       final uri = super.editTeacherPath(id);
 
-      // Mengecek jika fileBytes ada dan bukan null
-      if (fileBytes != null) {
-        // Mengecek apakah file adalah gambar dengan ekstensi yang diterima
-        final allowedExtensions = ['jpg', 'jpeg', 'png'];
-        final fileExtension = fileName?.split('.').last.toLowerCase();
+      // Jika ada fileBytes, gunakan MultipartRequest
+      if (fileBytes != null && fileName != null) {
+        final request = http.MultipartRequest(
+            'POST', uri) // Ubah method ke POST jika server mengharapkan POST
+          ..headers.addAll({
+            'Authorization': 'Bearer $tokenUser',
+            'Accept': 'application/json',
+          });
+        data.forEach((key, value) {
+          debugPrint('Key: $key, Value: $value');
+          if (value != null && value.toString().isNotEmpty) {
+            request.fields[key] = value.toString();
+          }
+        });
+        request.fields['_method'] = 'PUT';
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'foto',
+            fileBytes,
+            filename: fileName,
+            contentType: MediaType('image', fileName.split('.').last),
+          ),
+          
+        );
+        final response = await request.send();
+        debugPrint('edit teacher dengan gambar');
+        final responseBody = await response.stream.bytesToString();
+        debugPrint('Response Status Code: ${response.statusCode}');
+        debugPrint('Response Body: $responseBody');
 
-        if (fileExtension != null &&
-            !allowedExtensions.contains(fileExtension)) {
-          debugPrint('Format gambar tidak didukung');
-          throw Exception('Format gambar tidak didukung');
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          debugPrint('Berhasil edit teacher dengan gambar');
+          final responseData = json.decode(responseBody);
+          _teachersModel = TeachersModel.fromJson(responseData);
+          notifyListeners();
+        } else {
+          debugPrint('Gagal edit teacher: ${response.statusCode}');
         }
-
-        // Membatasi ukuran file jika lebih dari 2MB
-        if (fileBytes.length > 2 * 1024 * 1024) {
-          debugPrint('Ukuran gambar terlalu besar, maksimal 2MB');
-          throw Exception('Ukuran gambar terlalu besar, maksimal 2MB');
-        }
-
-        // Mengonversi foto menjadi base64
-        String base64Image = base64Encode(fileBytes);
-        data['foto'] = base64Image;
-      }
-
-      // Menyiapkan request dengan 'Content-Type' application/json
-      final response = await http.put(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $tokenUser',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(data), // Kirim data sebagai JSON
-      );
-
-      // Mengecek respon dari server
-      debugPrint('Response Status Code: ${response.statusCode}');
-      final responseBody = response.body;
-      debugPrint('Response Body: $responseBody');
-      debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = json.decode(responseBody);
-        debugPrint('Berhasil edit data siswa');
-        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
-        _teachersModel= TeachersModel.fromJson(responseData);
-        notifyListeners();
       } else {
-        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+        // Jika tidak ada file, gunakan JSON POST
+        final response = await http.put(
+          // Atau ubah ke http.put jika server mengharapkan PUT
+          uri,
+          headers: {
+            'Authorization': 'Bearer $tokenUser',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(data),
+        );
+
+        debugPrint('Response Status Code: ${response.statusCode}');
+        final responseBody = response.body;
+        debugPrint('Response Body: $responseBody');
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          debugPrint('Berhasil edit teacher tanpa gambar');
+          final responseData = json.decode(responseBody);
+          _teachersModel = TeachersModel.fromJson(responseData);
+          notifyListeners();
+        } else {
+          debugPrint('Gagal edit teacher: ${response.statusCode}');
+        }
       }
     } catch (e) {
-      debugPrint('Error edit data siswa: $e');
+      debugPrint('Error edit teacher: $e');
     }
   }
 }

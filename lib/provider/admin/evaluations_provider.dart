@@ -6,7 +6,10 @@ import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/admin/evaluation/evaluations_detail_model.dart';
 import 'package:si_pkl/models/admin/evaluation/evaluations_model.dart';
 import 'package:si_pkl/models/admin/evaluation/evaluations_show_model.dart';
+
 class EvaluationsProvider extends BaseApi with ChangeNotifier {
+  EvaluationDates? _evaluationDates;
+  EvaluationDates? get evaluationDates => _evaluationDates;
   EvaluationsModel? _evaluationsModel;
   EvaluationsModel? get evaluationsModel => _evaluationsModel;
   EvaluationsDetailModel? _evaluationsDetailModel;
@@ -32,6 +35,17 @@ class EvaluationsProvider extends BaseApi with ChangeNotifier {
         debugPrint('Berhasil mendapatkan data: ${response.statusCode}');
         final responseData = json.decode(response.body);
         _evaluationsModel = EvaluationsModel.fromJson(responseData);
+        debugPrint(
+            'parsed evaluationsDates: ${_evaluationsModel?.evaluationsDates}');
+        if (_evaluationsModel?.evaluationsDates != null &&
+            _evaluationsModel!.evaluationsDates!.isNotEmpty) {
+          _evaluationDates = _evaluationsModel!.evaluationsDates!.last;
+          debugPrint(
+              'evaluationDates terbaru: ${_evaluationDates?.startDate} - ${_evaluationDates?.endDate}');
+        } else {
+          _evaluationDates = null;
+          debugPrint('Tidak ada evaluationDates yang valid');
+        }
         notifyListeners();
         debugPrint('Data berhasil di-parse: $_evaluationsModel');
         debugPrint('respon data: $responseData');
@@ -42,6 +56,7 @@ class EvaluationsProvider extends BaseApi with ChangeNotifier {
       debugPrint('Bimbingan Siswa Provider Error: $e');
     }
   }
+
   Future<void> getEvaluationDetail(int id) async {
     final tokenUser = authController.authToken;
 
@@ -69,6 +84,7 @@ class EvaluationsProvider extends BaseApi with ChangeNotifier {
       debugPrint('Bimbingan Siswa Provider Error: $e');
     }
   }
+
   Future<void> getEvaluationShow(int id) async {
     final tokenUser = authController.authToken;
 

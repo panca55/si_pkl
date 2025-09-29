@@ -98,6 +98,8 @@ class InternProvider extends BaseApi with ChangeNotifier {
   Future<void> submitLogbook({
     required String judul,
     required String category,
+    String? bentukKegiatan,
+    String? penugasanPekerjaan,
     required String tanggal,
     required String mulai,
     required String selesai,
@@ -115,6 +117,9 @@ class InternProvider extends BaseApi with ChangeNotifier {
         ..fields.addAll({
           'judul': judul,
           'category': category,
+          if (bentukKegiatan != null) 'bentuk_kegiatan': bentukKegiatan,
+          if (penugasanPekerjaan != null)
+            'penugasan_pekerjaan': penugasanPekerjaan,
           'tanggal': tanggal,
           'mulai': mulai,
           'selesai': selesai,
@@ -172,6 +177,127 @@ class InternProvider extends BaseApi with ChangeNotifier {
     }
   }
 
+  Future<void> editLogbook({
+    required int id,
+    required String judul,
+    required String category,
+    String? bentukKegiatan,
+    String? penugasanPekerjaan,
+    required String tanggal,
+    required String mulai,
+    required String selesai,
+    required String petugas,
+    required String isi,
+    required String keterangan,
+    Uint8List? fileBytes,
+    String? filePath,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.editLogbookPath(id);
+      debugPrint('Edit logbook URL: $uri');
+      debugPrint(
+          'Edit logbook data: judul=$judul, category=$category, isi=$isi, keterangan=$keterangan');
+      final request = http.MultipartRequest('POST', uri)
+        ..headers.addAll(super.getHeaders(tokenUser))
+        ..fields.addAll({
+          'judul': judul,
+          'category': category,
+          if (bentukKegiatan != null) 'bentuk_kegiatan': bentukKegiatan,
+          if (penugasanPekerjaan != null)
+            'penugasan_pekerjaan': penugasanPekerjaan,
+          'tanggal': tanggal,
+          'mulai': mulai,
+          'selesai': selesai,
+          'petugas': petugas,
+          'isi': isi,
+          'keterangan': keterangan,
+        });
+
+      debugPrint('Fields being sent: ${request.fields}');
+
+      if (kIsWeb) {
+        if (fileBytes != null) {
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'foto_kegiatan',
+              fileBytes,
+              filename: 'attendance_photo.jpg',
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+        }
+      } else if (universal_io.Platform.isAndroid ||
+          universal_io.Platform.isIOS) {
+        if (filePath != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'foto_kegiatan',
+              filePath,
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+        } else {
+          throw Exception("File path is null for mobile platform.");
+        }
+      }
+
+      final response = await request.send();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Berhasil edit logbook');
+        // Update existing logbook
+        final logbookIndex =
+            _currentIntern?.logbook?.indexWhere((lb) => lb.id == id);
+        if (logbookIndex != null && logbookIndex >= 0) {
+          final updatedLogbook = Logbook(
+            id: id,
+            judul: judul,
+            category: category,
+            bentukKegiatan: bentukKegiatan,
+            penugasanPekerjaan: penugasanPekerjaan,
+            tanggal: tanggal,
+            mulai: mulai,
+            selesai: selesai,
+            petugas: petugas,
+            isi: isi,
+            keterangan: keterangan,
+            createdAt: _currentIntern!.logbook![logbookIndex].createdAt,
+            updatedAt: DateTime.now().toString(),
+          );
+          _currentIntern!.logbook![logbookIndex] = updatedLogbook;
+        }
+        notifyListeners();
+      } else {
+        debugPrint('Gagal edit logbook: ${response.statusCode}');
+        // Show error message
+        throw Exception('Failed to edit logbook: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error editLogbook: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteLogbook({required int id}) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.deleteLogbookPath(id);
+      final response = await http.delete(
+        uri,
+        headers: super.getHeaders(tokenUser),
+      );
+      if (response.statusCode == 200) {
+        _currentIntern?.logbook
+            ?.removeWhere((logbook) => logbook.id == id);
+        notifyListeners();
+        debugPrint('Berhasil menghapus logbook');
+      } else {
+        debugPrint('Gagal menghapus logbook: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error deleteLogbook: $e');
+    }
+  }
   // Periksa apakah hari ini dalam masa PKL
   bool isMasaPkl({
     required String tanggalMulai,

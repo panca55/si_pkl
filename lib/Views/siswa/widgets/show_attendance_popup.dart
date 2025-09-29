@@ -1,4 +1,3 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,40 +7,6 @@ Future<void> showAttendancePopup({
   required BuildContext context,
   required Function(String, Uint8List?, String?) onSubmit,
 }) async {
-  CameraController? cameraController;
-  List<CameraDescription>? cameras;
-  bool isCameraInitialized = false;
-
-  // Initialize camera only for mobile platforms
-  if (!kIsWeb) {
-    try {
-      cameras = await availableCameras();
-      if (cameras.isNotEmpty) {
-        // Cari camera depan (front camera)
-        CameraDescription? frontCamera;
-        for (var camera in cameras) {
-          if (camera.lensDirection == CameraLensDirection.front) {
-            frontCamera = camera;
-            break;
-          }
-        }
-
-        // Gunakan camera depan jika ada, jika tidak gunakan camera pertama
-        final selectedCamera = frontCamera ?? cameras.first;
-
-        cameraController = CameraController(
-          selectedCamera,
-          ResolutionPreset.medium,
-          enableAudio: false,
-        );
-        await cameraController.initialize();
-        isCameraInitialized = true;
-      }
-    } catch (e) {
-      debugPrint("Error initializing camera: $e");
-    }
-  }
-
   String? selectedStatus;
   Uint8List? capturedImageBytes;
   String? filePath;
@@ -334,254 +299,59 @@ Future<void> showAttendancePopup({
                                     border: Border.all(
                                         color: const Color(0xFFD1D5DB)),
                                   ),
-                                  child: Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(11),
-                                        child: capturedImageBytes != null
-                                            ? Image.memory(
-                                                capturedImageBytes!,
-                                                fit: BoxFit.cover,
-                                                width: double.infinity,
-                                                height: double.infinity,
-                                              )
-                                            : (!kIsWeb &&
-                                                    isCameraInitialized &&
-                                                    !isLoading &&
-                                                    cameraController != null &&
-                                                    cameraController!
-                                                        .value.isInitialized)
-                                                ? SizedBox(
-                                                    width: double.infinity,
-                                                    height: double.infinity,
-                                                    child: FittedBox(
-                                                      fit: BoxFit.cover,
-                                                      child: SizedBox(
-                                                        width: cameraController!
-                                                            .value
-                                                            .previewSize!
-                                                            .height,
-                                                        height:
-                                                            cameraController!
-                                                                .value
-                                                                .previewSize!
-                                                                .width,
-                                                        child: Transform(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          transform: Matrix4
-                                                              .identity()
-                                                            ..scale(
-                                                                cameraController
-                                                                            ?.description
-                                                                            .lensDirection ==
-                                                                        CameraLensDirection
-                                                                            .front
-                                                                    ? -1.0
-                                                                    : 1.0,
-                                                                1.0),
-                                                          child: CameraPreview(
-                                                              cameraController!),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    color: Colors.grey[100],
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        if (isLoading)
-                                                          const CircularProgressIndicator(
-                                                            valueColor:
-                                                                AlwaysStoppedAnimation<
-                                                                    Color>(
-                                                              Color(0xFF6366F1),
-                                                            ),
-                                                          )
-                                                        else
-                                                          Icon(
-                                                            Icons
-                                                                .camera_alt_outlined,
-                                                            size: 50,
-                                                            color: Colors
-                                                                .grey[400],
-                                                          ),
-                                                        const SizedBox(
-                                                            height: 12),
-                                                        Text(
-                                                          isLoading
-                                                              ? "Switching camera..."
-                                                              : kIsWeb
-                                                                  ? "Camera tidak tersedia di web"
-                                                                  : "Menginisialisasi kamera...",
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .grey[600],
-                                                            fontSize: 14,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                      ),
-                                      // Switch Camera Button
-                                      if (!kIsWeb &&
-                                          isCameraInitialized &&
-                                          !isLoading &&
-                                          capturedImageBytes == null &&
-                                          cameras != null &&
-                                          cameras.length > 1)
-                                        Positioned(
-                                          top: 12,
-                                          right: 12,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Colors.black.withOpacity(0.6),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: IconButton(
-                                              onPressed: () async {
-                                                if (cameras == null ||
-                                                    cameraController == null ||
-                                                    isLoading ||
-                                                    !cameraController!.value
-                                                        .isInitialized) return;
-
-                                                try {
-                                                  setState(
-                                                      () => isLoading = true);
-
-                                                  // Find next camera first
-                                                  final currentIndex = cameras
-                                                      .indexOf(cameraController!
-                                                          .description);
-                                                  final nextIndex =
-                                                      (currentIndex + 1) %
-                                                          cameras.length;
-                                                  final nextCamera =
-                                                      cameras[nextIndex];
-
-                                                  // Dispose current controller safely
-                                                  final oldController =
-                                                      cameraController;
-                                                  cameraController = null;
-                                                  isCameraInitialized = false;
-
-                                                  await oldController
-                                                      ?.dispose();
-
-                                                  // Wait for cleanup
-                                                  await Future.delayed(
-                                                      const Duration(
-                                                          milliseconds: 500));
-
-                                                  // Initialize new camera
-                                                  cameraController =
-                                                      CameraController(
-                                                    nextCamera,
-                                                    ResolutionPreset.medium,
-                                                    enableAudio: false,
-                                                  );
-
-                                                  await cameraController!
-                                                      .initialize();
-                                                  isCameraInitialized = true;
-
-                                                  // Small delay before updating UI
-                                                  await Future.delayed(
-                                                      const Duration(
-                                                          milliseconds: 100));
-
-                                                  setState(
-                                                      () => isLoading = false);
-                                                } catch (e) {
-                                                  debugPrint(
-                                                      "Error switching camera: $e");
-                                                  setState(
-                                                      () => isLoading = false);
-
-                                                  // Try to reinitialize with front camera
-                                                  try {
-                                                    CameraDescription?
-                                                        frontCamera;
-                                                    for (var camera
-                                                        in cameras) {
-                                                      if (camera
-                                                              .lensDirection ==
-                                                          CameraLensDirection
-                                                              .front) {
-                                                        frontCamera = camera;
-                                                        break;
-                                                      }
-                                                    }
-
-                                                    final selectedCamera =
-                                                        frontCamera ??
-                                                            cameras.first;
-                                                    cameraController =
-                                                        CameraController(
-                                                      selectedCamera,
-                                                      ResolutionPreset.medium,
-                                                      enableAudio: false,
-                                                    );
-                                                    await cameraController!
-                                                        .initialize();
-                                                    isCameraInitialized = true;
-                                                    setState(() {});
-                                                  } catch (reinitError) {
-                                                    debugPrint(
-                                                        "Failed to reinitialize camera: $reinitError");
-                                                    isCameraInitialized = false;
-                                                  }
-                                                }
-                                              },
-                                              icon: const Icon(
-                                                Icons.flip_camera_ios,
-                                                color: Colors.white,
-                                                size: 24,
+                                  child: capturedImageBytes != null
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.memory(
+                                            capturedImageBytes!,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : Container(
+                                          color: Colors.grey[100],
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.camera_alt_outlined,
+                                                size: 50,
+                                                color: Colors.grey[400],
                                               ),
-                                            ),
+                                              const SizedBox(height: 12),
+                                              Text(
+                                                "Tekan tombol Ambil Foto untuk mengakses kamera",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.grey[600],
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                    ],
-                                  ),
                                 ),
 
                                 const SizedBox(height: 16),
                                 SizedBox(
                                   width: double.infinity,
                                   child: ElevatedButton.icon(
-                                    onPressed: (isLoading ||
-                                            (!kIsWeb && !isCameraInitialized))
+                                    onPressed: isLoading
                                         ? null
                                         : () async {
                                             setState(() => isLoading = true);
                                             try {
-                                              if (isCameraInitialized) {
-                                                final XFile image =
-                                                    await cameraController!
-                                                        .takePicture();
-                                                filePath = image.path;
+                                              final ImagePicker picker =
+                                                  ImagePicker();
+                                              final XFile? image =
+                                                  await picker.pickImage(
+                                                source: ImageSource.camera,
+                                              );
+                                              if (image != null) {
                                                 capturedImageBytes =
                                                     await image.readAsBytes();
-                                              } else {
-                                                // Fallback to image picker for camera
-                                                final ImagePicker picker =
-                                                    ImagePicker();
-                                                final XFile? image =
-                                                    await picker.pickImage(
-                                                  source: ImageSource.camera,
-                                                );
-                                                if (image != null) {
-                                                  capturedImageBytes =
-                                                      await image.readAsBytes();
-                                                  filePath = image.path;
-                                                }
+                                                filePath = image.path;
                                               }
                                             } catch (e) {
                                               debugPrint(
@@ -647,10 +417,6 @@ Future<void> showAttendancePopup({
                             onPressed: isLoading
                                 ? null
                                 : () async {
-                                    // Dispose camera before closing
-                                    if (!kIsWeb && cameraController != null) {
-                                      await cameraController?.dispose();
-                                    }
                                     Navigator.pop(context);
                                   },
                             style: TextButton.styleFrom(
@@ -677,10 +443,6 @@ Future<void> showAttendancePopup({
                                     capturedImageBytes != null &&
                                     !isLoading)
                                 ? () async {
-                                    // Dispose camera before closing
-                                    if (!kIsWeb && cameraController != null) {
-                                      await cameraController?.dispose();
-                                    }
                                     onSubmit(selectedStatus!,
                                         capturedImageBytes, filePath);
                                     Navigator.pop(context, true);
@@ -712,8 +474,5 @@ Future<void> showAttendancePopup({
     },
   ).then((_) {
     // Dispose camera controller when dialog closes
-    if (!kIsWeb && cameraController != null) {
-      cameraController?.dispose();
-    }
   });
 }
