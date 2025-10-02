@@ -118,7 +118,7 @@ class _ProfileGuruState extends State<ProfileGuru> {
                 child: ListView(
                   children: [
                     Image.network(
-                      '${BaseApi.base}/storage/public/students-images/${guru.foto}',
+                      '${BaseApi.teacherImageUrl}/${guru.foto}',
                       errorBuilder: (context, error, stackTrace) {
                         return const Icon(
                           Icons.person,

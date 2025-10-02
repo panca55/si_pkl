@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/admin/corporations_model.dart';
-import 'package:universal_io/io.dart' as universal_io;
+
 class CorporationsProvider extends BaseApi with ChangeNotifier {
   CorporationsModel? _corporationsModel;
   CorporationsModel? get corporationsModel => _corporationsModel;
@@ -44,6 +43,7 @@ class CorporationsProvider extends BaseApi with ChangeNotifier {
       debugPrint('Error menghapus data user:: $e');
     }
   }
+
   Future<void> getCorporations() async {
     final tokenUser = authController.authToken;
 
@@ -80,68 +80,6 @@ class CorporationsProvider extends BaseApi with ChangeNotifier {
     final tokenUser = authController.authToken;
     try {
       final uri = super.addCorporatePath;
-      final request = http.MultipartRequest('POST', uri)
-        ..headers.addAll({
-          ...super.getHeaders(tokenUser),
-        });
-      data.forEach((key, value) {
-        if (value != null) {
-          request.fields[key] = value.toString();
-        }
-      });
-      if (fileBytes != null && fileName != null) {
-        if (kIsWeb) {
-          request.files.add(
-            http.MultipartFile.fromBytes(
-              'foto',
-              fileBytes,
-              filename: fileName,
-              contentType: MediaType('image', fileName.split('.').last),
-            ),
-          );
-        } else if (universal_io.Platform.isAndroid ||
-            universal_io.Platform.isIOS) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'foto',
-              filePath!,
-              filename: fileName,
-              contentType: MediaType('image', fileName.split('.').last),
-            ),
-          );
-        }
-      }
-
-      debugPrint('Request Body: ${jsonEncode(data)}');
-      final response = await request.send();
-      debugPrint('Response Status Code: ${response.statusCode}');
-      final responseBody = await response.stream.bytesToString();
-      debugPrint('Response Body: $responseBody');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint('Berhasil submit logbook');
-        final responseData = json.decode(responseBody);
-        _corporationsModel = CorporationsModel.fromJson(responseData);
-        final newInstruktur = Corporations.fromJson(data);
-        _corporationsModel?.corporation?.add(newInstruktur);
-        notifyListeners();
-      } else {
-        debugPrint('Gagal submit komentar: ${response.statusCode}');
-        debugPrint('Request: $request');
-      }
-    } catch (e) {
-      debugPrint('Error submitKomentar: $e');
-    }
-  }
-  Future<void> editCorporate({
-    required int id,
-    required Map<String, dynamic> data,
-    required Uint8List? fileBytes,
-    String? fileName,
-  }) async {
-    final tokenUser = authController.authToken;
-    try {
-      final uri = super.editCorporatePath(id);
 
       // Mengecek jika fileBytes ada dan bukan null
       if (fileBytes != null) {
@@ -167,7 +105,7 @@ class CorporationsProvider extends BaseApi with ChangeNotifier {
       }
 
       // Menyiapkan request dengan 'Content-Type' application/json
-      final response = await http.put(
+      final response = await http.post(
         uri,
         headers: {
           'Authorization': 'Bearer $tokenUser',
@@ -184,13 +122,106 @@ class CorporationsProvider extends BaseApi with ChangeNotifier {
       debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Berhasil menambah data corporate');
         final responseData = json.decode(responseBody);
-        debugPrint('Berhasil edit data corporate');
-        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
-        _corporationsModel = CorporationsModel.fromJson(responseData);
+        Corporations newCorp =
+            Corporations.fromJson(responseData['corporations']);
+        _corporation.add(newCorp);
         notifyListeners();
       } else {
-        debugPrint('Gagal edit data corporate: ${response.statusCode}');
+        debugPrint('Gagal menambah data corporate: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error menambah data corporate: $e');
+    }
+  }
+
+  Future<void> editCorporate({
+    required int id,
+    required Map<String, dynamic> data,
+    required Uint8List? fileBytes,
+    String? fileName,
+  }) async {
+    final tokenUser = authController.authToken;
+    try {
+      final uri = super.editCorporatePath(id);
+
+      if (fileBytes != null) {
+        // validations
+        final allowedExtensions = ['jpg', 'jpeg', 'png'];
+        final fileExtension = fileName?.split('.').last.toLowerCase();
+
+        if (fileExtension != null &&
+            !allowedExtensions.contains(fileExtension)) {
+          debugPrint('Format gambar tidak didukung');
+          throw Exception('Format gambar tidak didukung');
+        }
+
+        if (fileBytes.length > 2 * 1024 * 1024) {
+          debugPrint('Ukuran gambar terlalu besar, maksimal 2MB');
+          throw Exception('Ukuran gambar terlalu besar, maksimal 2MB');
+        }
+
+        var request = http.MultipartRequest('POST', uri);
+        request.headers.addAll({
+          'Authorization': 'Bearer $tokenUser',
+          'Accept': 'application/json',
+        });
+        data.forEach((key, value) {
+          request.fields[key] = value.toString();
+        });
+        request.fields['_method'] = 'PUT';
+        request.files.add(await http.MultipartFile.fromBytes('foto', fileBytes,
+            filename: fileName));
+        final streamedResponse = await request.send();
+        final response = await http.Response.fromStream(streamedResponse);
+        final responseBody = response.body;
+        debugPrint('Response Status Code: ${response.statusCode}');
+        debugPrint('Response Body: $responseBody');
+        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final responseData = json.decode(responseBody);
+          Corporations updatedCorp =
+              Corporations.fromJson(responseData['corporations']);
+          int index = _corporation.indexWhere((c) => c.id == id);
+          if (index != -1) {
+            _corporation[index] = updatedCorp;
+          }
+          notifyListeners();
+          debugPrint('Berhasil edit data corporate');
+        } else {
+          debugPrint('Gagal edit data corporate: ${response.statusCode}');
+        }
+      } else {
+        data['_method'] = 'PUT';
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer $tokenUser',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(data),
+        );
+        final responseBody = response.body;
+        debugPrint('Response Status Code: ${response.statusCode}');
+        debugPrint('Response Body: $responseBody');
+        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final responseData = json.decode(responseBody);
+          Corporations updatedCorp =
+              Corporations.fromJson(responseData['corporations']);
+          int index = _corporation.indexWhere((c) => c.id == id);
+          if (index != -1) {
+            _corporation[index] = updatedCorp;
+          }
+          notifyListeners();
+          debugPrint('Berhasil edit data corporate');
+        } else {
+          debugPrint('Gagal edit data corporate: ${response.statusCode}');
+        }
       }
     } catch (e) {
       debugPrint('Error edit data corporate: $e');

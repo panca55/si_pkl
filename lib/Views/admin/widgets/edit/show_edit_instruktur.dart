@@ -277,7 +277,7 @@ Future<void> showEditInstrukturPopup(
                         Align(
                             alignment: Alignment.centerLeft,
                             child: Image.network(
-                              '${BaseApi.base}/storage/public/instructors-images/$fileName',
+                              '${BaseApi.instructorImageUrl}/$fileName',
                               height: 40,
                               width: 40,
                               errorBuilder: (context, error, stackTrace) =>

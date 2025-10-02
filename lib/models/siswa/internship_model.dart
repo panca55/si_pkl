@@ -253,3 +253,94 @@ class AttendanceDetail {
     );
   }
 }
+
+class Attendance {
+  int? id;
+  int? internshipId;
+  String? tanggal;
+  String? keterangan;
+  String? deskripsi;
+  String? photo;
+  bool? validasi;
+  String? createdAt;
+  String? updatedAt;
+
+  Attendance({
+    this.id,
+    this.internshipId,
+    this.tanggal,
+    this.keterangan,
+    this.deskripsi,
+    this.photo,
+    this.validasi,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory Attendance.fromJson(Map<String, dynamic> json) {
+    return Attendance(
+      id: json['id'],
+      internshipId: json['internship_id'],
+      tanggal: json['tanggal'],
+      keterangan: json['keterangan'],
+      deskripsi: json['deskripsi'],
+      photo: json['photo'],
+      validasi: json['validasi'] == 1,
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+    );
+  }
+}
+
+class Week {
+  String? start;
+  String? end;
+  String? label;
+
+  Week({this.start, this.end, this.label});
+
+  factory Week.fromJson(Map<String, dynamic> json) {
+    return Week(
+      start: json['start'],
+      end: json['end'],
+      label: json['label'],
+    );
+  }
+}
+
+class Month {
+  String? value;
+  String? label;
+
+  Month({this.value, this.label});
+
+  factory Month.fromJson(Map<String, dynamic> json) {
+    return Month(
+      value: json['value'],
+      label: json['label'],
+    );
+  }
+}
+
+class AttendanceDetailModel {
+  List<Attendance>? attendances;
+  List<Week>? weeks;
+  List<Month>? months;
+
+  AttendanceDetailModel({this.attendances, this.weeks, this.months});
+
+  factory AttendanceDetailModel.fromJson(Map<String, dynamic> json) {
+    return AttendanceDetailModel(
+      attendances: json['attendances'] != null
+          ? List<Attendance>.from(
+              json['attendances'].map((x) => Attendance.fromJson(x)))
+          : null,
+      weeks: json['weeks'] != null
+          ? List<Week>.from(json['weeks'].map((x) => Week.fromJson(x)))
+          : null,
+      months: json['months'] != null
+          ? List<Month>.from(json['months'].map((x) => Month.fromJson(x)))
+          : null,
+    );
+  }
+}

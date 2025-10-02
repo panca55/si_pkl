@@ -90,7 +90,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       if (p.foto != null) {
         _currentImageUrl =
-            '${BaseApi.base}/storage/public/corporations-images/${p.foto}';
+            '${BaseApi.corporateImageUrl}/${p.foto}';
       }
     }
   }

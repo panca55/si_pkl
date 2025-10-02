@@ -22,16 +22,22 @@ class Mayor {
       this.departmentId,
       this.nama,
       this.createdAt,
-      this.updatedAt, 
+      this.updatedAt,
       this.department});
 
   factory Mayor.fromJson(Map<String, dynamic> json) => Mayor(
-      id: json["id"],
-      departmentId: json["department_id"],
-      nama: json["nama"],
-      createdAt: DateTime.parse(json["created_at"]),
-      updatedAt: DateTime.parse(json["updated_at"]),
-      department: json['department'] != null
+        id: json["id"] != null ? int.parse(json["id"].toString()) : null,
+        departmentId: json["department_id"] != null
+            ? int.parse(json["department_id"].toString())
+            : null,
+        nama: json["nama"],
+        createdAt: json["created_at"] != null
+            ? DateTime.parse(json["created_at"])
+            : null,
+        updatedAt: json["updated_at"] != null
+            ? DateTime.parse(json["updated_at"])
+            : null,
+        department: json['department'] != null
             ? Department.fromJson(json['department'])
             : null,
       );

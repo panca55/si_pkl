@@ -1,8 +1,19 @@
 class BaseApi {
-  // IP Address komputer di jaringan lokal untuk akses dari HP
+  // IP Address komputer di jaringan lok
   // Sudah disesuaikan dengan IP address komputer: 192.168.1.6
-  static var base = "http://127.0.0.1:8000";
-  static var api = "$base/api";
+  static String base = "http://127.0.0.1:8000";
+  static String api = "$base/api";
+
+  static String corporateImageUrl = "$base/storage/public/corporations-images";
+  static String corporateLogoUrl = "$base/storage/public/corporations-logos";
+  static String studentImageUrl = "$base/storage/public/students-images";
+  static String profileStudentImageUrl = "$base/storage/public/public/students-images";
+
+  static String teacherImageUrl = "$base/storage/public/teachers-images";
+  static String instructorImageUrl = "$base/storage/public/instructors-images";
+  static String logbookImageUrl = "$base/storage/public/foto-kegiatan";
+  static String absenImageUrl = "$base/storage/public/Absents-Siswa";
+  static String suratIzinFileUrl = "$base/storage/public";
 
   var authPath = Uri.parse("$api/login");
   var registerPath = Uri.parse("$api/register");
@@ -53,19 +64,23 @@ class BaseApi {
   var teachersPath = Uri.parse("$api/teacher");
   var usersPath = Uri.parse("$api/users");
   var absentsPath = Uri.parse("$api/admin/intern/absen");
+  var attendanceDetailPath = Uri.parse("$api/intern/attendance-detail");
   static int? id;
 
   Uri infoDetailPath(int? id) => Uri.parse("$api/info/$id");
   Uri siswaIndexPath(int? id) => Uri.parse("$api/pimpinan/siswa/$id");
   Uri editStudentPath(int? id) => Uri.parse("$api/student/$id");
+  Uri editStudentProfilePath(int? id) => Uri.parse("$api/profil/siswa/$id");
   Uri editTeacherProfilePath(int? id) => Uri.parse("$api/teacher/profile/$id");
   Uri editCorporateProfilePath(int? id) =>
       Uri.parse("$api/korporat/profile/$id");
   Uri editInstructoreProfilePath(int? id) =>
       Uri.parse("$api/instruktur/profile/$id");
 
-  Uri editLogbookPath(int? id) => Uri.parse("$api/student/internship/logbook/$id");
-  Uri deleteLogbookPath(int? id) => Uri.parse("$api/student/internship/logbook/$id");
+  Uri editLogbookPath(int? id) =>
+      Uri.parse("$api/student/internship/logbook/$id");
+  Uri deleteLogbookPath(int? id) =>
+      Uri.parse("$api/student/internship/logbook/$id");
   Uri editMayorPath(int? id) => Uri.parse("$api/mayor/$id");
   Uri editUserPath(int? id) => Uri.parse("$api/users/$id");
   Uri deleteUserPath(int? id) => Uri.parse("$api/users/$id");

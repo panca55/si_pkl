@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/Views/perusahaan/edit_profile_page.dart';
 import 'package:si_pkl/models/perusahaan/profile_perusahaan_model.dart';
 import 'package:si_pkl/provider/perusahaan/profile_perusahaan_provider.dart';
@@ -105,7 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 100,
                 height: 100,
                 child: Image.network(
-                  'http://localhost:8000/storage/public/corporations-images/${profileModel.profile?.foto}',
+                  '${BaseApi.corporateImageUrl}/${profileModel.profile?.foto}',
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return const Icon(

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/login_page.dart';
 import 'package:si_pkl/Views/pimpinan/siswa_pkl_detail.dart';
+import 'package:si_pkl/Views/siswa/attendance_detail_page.dart';
 import 'package:si_pkl/Views/siswa/create_profile.dart';
 import 'package:si_pkl/Views/siswa/dashboard.dart';
 import 'package:si_pkl/Views/siswa/evaluasi_page.dart';
@@ -223,10 +224,10 @@ class _DashboardSideState extends State<DashboardSide>
                 key: _navigatorKey,
                 onGenerateRoute: (RouteSettings settings) {
                   Widget page = _pages[_currentPage]!;
-                  if (settings.name == SiswaPklDetail.routname) {
-                    page = SiswaPklDetail(
-                      siswaId:
-                          ModalRoute.of(context)?.settings.arguments as int,
+                  if (settings.name == AttendanceDetailPage.routname) {
+                    page = AttendanceDetailPage(
+                      // siswaId:
+                      //     ModalRoute.of(context)?.settings.arguments as int,
                     );
                   }
                   return MaterialPageRoute(builder: (_) => page);
@@ -249,6 +250,8 @@ class _DashboardSideState extends State<DashboardSide>
         return Icons.info;
       case 'Penilaian dan Sertifikat':
         return Icons.info;
+      case 'Detail Absensi':
+        return Icons.calendar_today;
       default:
         return Icons.pages;
     }

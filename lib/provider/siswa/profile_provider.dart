@@ -6,6 +6,7 @@ import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/siswa/profile_model.dart';
 import 'package:universal_io/io.dart' as universal_io;
+
 class ProfileProvider extends BaseApi with ChangeNotifier {
   final List<ProfileModel> _siswa = [];
   List<ProfileModel> get siswa => _siswa;
@@ -19,6 +20,7 @@ class ProfileProvider extends BaseApi with ChangeNotifier {
     _currentSiswa = null;
     notifyListeners();
   }
+
   Future<void> getProfileSiswa() async {
     final tokenUser = authController.authToken;
     try {
@@ -56,6 +58,7 @@ class ProfileProvider extends BaseApi with ChangeNotifier {
       debugPrint('Profile Provider Error: $e');
     }
   }
+
   Future<void> createProfile(
       {required Map<String, dynamic> data,
       required Uint8List? fileBytes,
@@ -116,7 +119,7 @@ class ProfileProvider extends BaseApi with ChangeNotifier {
     }
   }
 
-  Future<void> editProfile({
+  Future<void> updateStudentProfile({
     required int id,
     required Map<String, dynamic> data,
     required Uint8List? fileBytes,
@@ -124,59 +127,72 @@ class ProfileProvider extends BaseApi with ChangeNotifier {
   }) async {
     final tokenUser = authController.authToken;
     try {
-      final uri = super.editStudentPath(id);
+      final uri = super.editStudentProfilePath(id);
 
-      // Mengecek jika fileBytes ada dan bukan null
-      if (fileBytes != null) {
-        // Mengecek apakah file adalah gambar dengan ekstensi yang diterima
-        final allowedExtensions = ['jpg', 'jpeg', 'png'];
-        final fileExtension = fileName?.split('.').last.toLowerCase();
-
-        if (fileExtension != null &&
-            !allowedExtensions.contains(fileExtension)) {
-          debugPrint('Format gambar tidak didukung');
-          throw Exception('Format gambar tidak didukung');
-        }
-
-        // Membatasi ukuran file jika lebih dari 2MB
-        if (fileBytes.length > 2 * 1024 * 1024) {
-          debugPrint('Ukuran gambar terlalu besar, maksimal 2MB');
-          throw Exception('Ukuran gambar terlalu besar, maksimal 2MB');
-        }
-
-        // Mengonversi foto menjadi base64
-        String base64Image = base64Encode(fileBytes);
-        data['foto'] = base64Image;
-      }
-
-      // Menyiapkan request dengan 'Content-Type' application/json
-      final response = await http.put(
-        uri,
-        headers: {
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['_method'] =
+            'PUT' // trik jika backend tidak support PUT multipart
+        ..headers.addAll({
           'Authorization': 'Bearer $tokenUser',
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(data), // Kirim data sebagai JSON
-      );
+        });
 
-      // Mengecek respon dari server
+      // Kirim semua field, kalau null jadikan string kosong
+      data.forEach((key, value) {
+        request.fields[key] = value?.toString() ?? "";
+        debugPrint('Adding field: $key = ${request.fields[key]}');
+      });
+
+      // Tambah file jika ada
+      if (fileBytes != null && fileName != null) {
+        final allowedExtensions = ['jpg', 'jpeg', 'png'];
+        final fileExtension = fileName.split('.').last.toLowerCase();
+
+        if (!allowedExtensions.contains(fileExtension)) {
+          throw Exception(
+              'Format gambar tidak didukung. Gunakan JPG, JPEG, atau PNG.');
+        }
+
+        if (fileBytes.length > 2 * 1024 * 1024) {
+          throw Exception('Ukuran gambar terlalu besar. Maksimal 2MB.');
+        }
+
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'foto',
+            fileBytes,
+            filename: fileName,
+            contentType: MediaType('image', fileExtension),
+          ),
+        );
+      }
+
+      debugPrint('Update Profile Request Data: $data');
+      debugPrint('File included: ${fileBytes != null}');
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
       debugPrint('Response Status Code: ${response.statusCode}');
-      final responseBody = response.body;
       debugPrint('Response Body: $responseBody');
-      debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = json.decode(responseBody);
-        debugPrint('Berhasil edit data siswa');
-        debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
-        _currentSiswa = ProfileModel.fromJson(responseData);
+
+        if (responseData['profile'] != null) {
+          _currentSiswa = ProfileModel.fromJson(responseData['profile']);
+        }
+
+        debugPrint('Berhasil update profile siswa');
         notifyListeners();
       } else {
-        debugPrint('Gagal edit data siswa: ${response.statusCode}');
+        final responseData = json.decode(responseBody);
+        throw Exception(responseData['message'] ?? 'Gagal update profile');
       }
     } catch (e) {
-      debugPrint('Error edit data siswa: $e');
+      debugPrint('Error update profile: $e');
+      rethrow;
     }
   }
+
 }

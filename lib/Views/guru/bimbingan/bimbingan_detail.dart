@@ -65,7 +65,7 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                     enableSwitchAnimation: true,
                     child: _buildInfoCard(
                       image:
-                          'http://localhost:8000/storage/public/students-images/${internship?.student?.foto}',
+                          '${BaseApi.studentImageUrl}/${internship?.student?.foto}',
                       colorHeader: GlobalColorTheme.primaryBlueColor,
                       title: 'Informasi Siswa',
                       property1: 'Nama',
@@ -200,8 +200,8 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                             : '-';
 
                         final imageUrl = absentsData.keterangan == 'HADIR'
-                            ? '${BaseApi.base}/storage/Absents-Siswa/${absentsData.photo}'
-                            : '${BaseApi.base}/storage/Surat-Izin-Siswa/${absentsData.photo}';
+                            ? '${BaseApi.absenImageUrl}/${absentsData.photo}'
+                            : '${BaseApi.suratIzinFileUrl}/${absentsData.photo}';
 
                         return DataRow(
                           cells: <DataCell>[
@@ -416,7 +416,7 @@ class _BimbinganDetailState extends State<BimbinganDetail> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.network(
-                                '${BaseApi.base}/storage/public/foto-kegiatan/${logbook.fotoKegiatan}',
+                                '${BaseApi.logbookImageUrl}/${logbook.fotoKegiatan}',
                                 fit: BoxFit.cover,
                                 height: 80,
                                 width: double.infinity,

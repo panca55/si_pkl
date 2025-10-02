@@ -49,13 +49,15 @@ class _EvaluasiPageState extends State<EvaluasiPage> {
               evaluationProvider.evaluationModel?.evaluationDate;
           debugPrint('Evaluation Data: ${evaluation?.sertifikat}');
           debugPrint('Evaluation Data: $evaluationDate');
-          // Handle if `evaluation` is null
-          if (evaluation == null || evaluationDate == null) {
+          // Handle if `evaluation` is null or empty
+          if (evaluation == null) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  'Belum periode penilaian',
+                  evaluationDate == null
+                      ? 'Belum periode penilaian'
+                      : 'Belum ada penilaian',
                   style: GoogleFonts.poppins(fontSize: 16),
                 ),
               ),

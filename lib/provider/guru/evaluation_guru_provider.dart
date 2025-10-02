@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:si_pkl/controller/auth_controller.dart';
 import 'package:si_pkl/Services/base_api.dart';
@@ -44,46 +43,67 @@ class EvaluationGuruProvider extends BaseApi with ChangeNotifier {
     }
   }
 
-  Future<void> getPrintEvaluation(int id) async {
+  Future<Uint8List?> getPrintEvaluation(int id) async {
     final tokenUser = authController.authToken;
 
     if (tokenUser == null) {
       debugPrint('Auth token is null. Please log in again.');
-      return;
+      return null;
     }
     try {
       http.Response response = await http.get(
         super.printEvaluationPath(id),
         headers: {
           'Authorization': 'Bearer $tokenUser',
-          'Content-Type': 'application/pdf',
-          'Accept': 'application/pdf',
+          'Accept': '*/*',
         },
       );
       if (response.statusCode == 200) {
         debugPrint('Berhasil mendapatkan data: ${response.statusCode}');
+        debugPrint('Content-Type: ${response.headers['content-type']}');
+        debugPrint('Content-Length: ${response.headers['content-length']}');
         debugPrint('Berhasil mendapatkan data PDF.');
+        debugPrint('PDF data length: ${response.bodyBytes.length}');
+        debugPrint('PDF data first 20 bytes: ${response.bodyBytes.take(20)}');
 
-        // Ubah data PDF menjadi byte array
-        Uint8List pdfData = response.bodyBytes;
-
-        if (kIsWeb) {
-          // Logika untuk platform web
-          // await _downloadPdfWeb(pdfData, 'assessment.pdf');
-        } else {
-          // Logika untuk platform non-web
-          await Printing.layoutPdf(
-            onLayout: (PdfPageFormat format) async => pdfData,
-          );
+        // Check if response is actually PDF data
+        if (response.bodyBytes.isEmpty) {
+          debugPrint('ERROR: PDF data is empty!');
+          return null;
         }
 
-        debugPrint('File berhasil dicetak.');
-        notifyListeners();
+        // Check if response is HTML error page instead of PDF
+        if (response.headers['content-type']?.contains('text/html') == true) {
+          debugPrint('ERROR: Server returned HTML instead of PDF!');
+          debugPrint('Response body: ${response.body}');
+          return null;
+        }
+
+        // Additional check: if response body starts with HTML tags, it's likely an error page
+        String responseStart = response.body.length > 100
+            ? response.body.substring(0, 100)
+            : response.body;
+        if (responseStart.contains('<html') ||
+            responseStart.contains('<HTML') ||
+            responseStart.contains('<!DOCTYPE html') ||
+            responseStart.contains('error') ||
+            responseStart.contains('Error') ||
+            responseStart.contains('404') ||
+            responseStart.contains('500')) {
+          debugPrint('ERROR: Response appears to be HTML error page, not PDF!');
+          debugPrint('Response start: $responseStart');
+          return null;
+        }
+
+        return response.bodyBytes;
       } else {
-        debugPrint('Gagal print: ${response.statusCode}');
+        debugPrint('Gagal mendapatkan PDF: ${response.statusCode}');
+        debugPrint('Response body: ${response.body}');
+        return null;
       }
     } catch (e) {
       debugPrint('Print Error: $e');
+      return null;
     }
   }
 

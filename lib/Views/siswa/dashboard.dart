@@ -1,6 +1,9 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/provider/siswa/profile_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -44,6 +47,18 @@ class _DashboardState extends State<Dashboard> {
               }
             }
             final namaSiswa = profileProvider.currentSiswa?.nama;
+            final foto =
+                profileProvider.currentSiswa?.internship?.corporation?.foto;
+            final logo =
+                profileProvider.currentSiswa?.internship?.corporation?.logo;
+            final fotoCorporate = (foto != null && foto.isNotEmpty)
+                ? '${BaseApi.corporateImageUrl}/$foto'
+                : '';
+            final logoCorporate = (logo != null && logo.isNotEmpty)
+                ? '${BaseApi.corporateLogoUrl}/${logo.contains('.') ? logo : '$logo.png'}'
+                : '';
+            debugPrint('Foto Corporate: $fotoCorporate');
+            debugPrint('Logo Corporate: $logoCorporate');
             return SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -59,7 +74,7 @@ class _DashboardState extends State<Dashboard> {
                     enableSwitchAnimation: true,
                     child: _buildInfoCard(
                         image:
-                            'http://localhost:8000/storage/public/teachers-images/${profileProvider.currentSiswa?.internship?.teacher?.foto}',
+                            '${BaseApi.teacherImageUrl}/${profileProvider.currentSiswa?.internship?.teacher?.foto}',
                         colorHeader: GlobalColorTheme.primaryBlueColor,
                         title: 'Guru Pembimbing',
                         property1: 'NIP',
@@ -87,7 +102,7 @@ class _DashboardState extends State<Dashboard> {
                     enableSwitchAnimation: true,
                     child: _buildInfoCard(
                         image:
-                            'http://localhost:8000/storage/public/instructors-images/${profileProvider.currentSiswa?.internship?.instructor?.foto}',
+                            '${BaseApi.instructorImageUrl}/${profileProvider.currentSiswa?.internship?.instructor?.foto}',
                         colorHeader: GlobalColorTheme.primaryBlueColor,
                         title: 'Instruktur',
                         property1: 'NIP',
@@ -114,8 +129,8 @@ class _DashboardState extends State<Dashboard> {
                     enabled: loading,
                     enableSwitchAnimation: true,
                     child: _buildInfoCard(
-                      image:
-                          'http://localhost:8000/storage/public/corporations-images/${profileProvider.currentSiswa?.internship?.corporation?.foto}',
+                      image: fotoCorporate,
+                      fallbackImage: logoCorporate,
                       colorHeader: GlobalColorTheme.primaryBlueColor,
                       title: 'Mitra',
                       property1: 'Nama Perusahaan',
@@ -198,6 +213,7 @@ class _DashboardState extends State<Dashboard> {
       required String property2,
       required String property3,
       required String image,
+      String? fallbackImage,
       String? property4,
       String? value1,
       String? value2,
@@ -243,16 +259,7 @@ class _DashboardState extends State<Dashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.network(
-                  image,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.person,
-                      size: 100,
-                      color: Colors.grey,
-                    );
-                  },
-                ),
+                _buildImageWidget(image, fallbackImage),
                 const Divider(),
                 _buildInfoRow(property1, value1 ?? '-'),
                 const SizedBox(height: 8),
@@ -267,6 +274,118 @@ class _DashboardState extends State<Dashboard> {
         ],
       ),
     );
+  }
+
+  Widget _buildImageWidget(String image, String? fallbackImage) {
+    if (image.isNotEmpty) {
+      return FutureBuilder<Uint8List?>(
+        future: _loadImageBytes(image),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasData && snapshot.data != null) {
+            return Image.memory(
+              snapshot.data!,
+              errorBuilder: (context, error, stackTrace) {
+                debugPrint(
+                    'Failed to display primary image: $image, error: $error');
+                if (fallbackImage != null && fallbackImage.isNotEmpty) {
+                  return FutureBuilder<Uint8List?>(
+                    future: _loadImageBytes(fallbackImage),
+                    builder: (context, snapshot2) {
+                      if (snapshot2.connectionState ==
+                          ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot2.hasData && snapshot2.data != null) {
+                        return Image.memory(snapshot2.data!);
+                      } else {
+                        return const Icon(
+                          Icons.business,
+                          size: 100,
+                          color: Colors.grey,
+                        );
+                      }
+                    },
+                  );
+                } else {
+                  return const Icon(
+                    Icons.person,
+                    size: 100,
+                    color: Colors.grey,
+                  );
+                }
+              },
+            );
+          } else {
+            debugPrint('Failed to load primary image bytes: $image');
+            if (fallbackImage != null && fallbackImage.isNotEmpty) {
+              return FutureBuilder<Uint8List?>(
+                future: _loadImageBytes(fallbackImage),
+                builder: (context, snapshot2) {
+                  if (snapshot2.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot2.hasData && snapshot2.data != null) {
+                    return Image.memory(snapshot2.data!);
+                  } else {
+                    return const Icon(
+                      Icons.business,
+                      size: 100,
+                      color: Colors.grey,
+                    );
+                  }
+                },
+              );
+            } else {
+              return const Icon(
+                Icons.person,
+                size: 100,
+                color: Colors.grey,
+              );
+            }
+          }
+        },
+      );
+    } else if (fallbackImage != null && fallbackImage.isNotEmpty) {
+      return FutureBuilder<Uint8List?>(
+        future: _loadImageBytes(fallbackImage),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasData && snapshot.data != null) {
+            return Image.memory(snapshot.data!);
+          } else {
+            debugPrint('Failed to load fallback image bytes: $fallbackImage');
+            return const Icon(
+              Icons.business,
+              size: 100,
+              color: Colors.grey,
+            );
+          }
+        },
+      );
+    } else {
+      return const Icon(
+        Icons.person,
+        size: 100,
+        color: Colors.grey,
+      );
+    }
+  }
+
+  Future<Uint8List?> _loadImageBytes(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        debugPrint(
+            'Failed to load image: $url, status: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error loading image: $url, error: $e');
+      return null;
+    }
   }
 
   Widget _buildInfoRow(String label, String value) {

@@ -78,7 +78,7 @@ class _ProfileInstrukturState extends State<ProfileInstruktur> {
               child: ListView(
                 children: [
                   Image.network(
-                    '${BaseApi.base}/storage/public/students-images/${instruktur.foto}',
+                    '${BaseApi.instructorImageUrl}/${instruktur.foto}',
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
                         Icons.person,

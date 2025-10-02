@@ -40,6 +40,25 @@ Future<void> showEditPerusahaanPopup(
   TimeOfDay? selectedStartTime;
   TimeOfDay? selectedEndTime;
 
+  if (jamMulai != null && jamMulai.isNotEmpty) {
+    try {
+      final parts = jamMulai.split(':');
+      selectedStartTime =
+          TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    } catch (e) {
+      debugPrint('Error parsing jamMulai: $e');
+    }
+  }
+  if (jamBerakhir != null && jamBerakhir.isNotEmpty) {
+    try {
+      final parts = jamBerakhir.split(':');
+      selectedEndTime =
+          TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    } catch (e) {
+      debugPrint('Error parsing jamBerakhir: $e');
+    }
+  }
+
   Future<void> pickFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -51,6 +70,11 @@ Future<void> showEditPerusahaanPopup(
       const maxFileSize = 2 * 1024 * 1024; // 2 MB dalam byte
       if (result.files.single.size > maxFileSize) {
         debugPrint('File terlalu besar, pilih file yang lebih kecil dari 2MB');
+        return;
+      }
+
+      if (result.files.single.bytes == null) {
+        debugPrint('Bytes is null, cannot use file');
         return;
       }
 
@@ -70,26 +94,31 @@ Future<void> showEditPerusahaanPopup(
     }
   }
 
-  Future<void> pickTime(BuildContext context, bool isStartTime) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (pickedTime != null) {
-      if (isStartTime) {
-        selectedStartTime = pickedTime;
-      } else {
-        selectedEndTime = pickedTime;
-      }
-    }
-  }
-
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder:
             (BuildContext context, void Function(void Function()) setState) {
+          Future<void> pickTime(bool isStartTime) async {
+            final TimeOfDay? pickedTime = await showTimePicker(
+              context: context,
+              initialTime: isStartTime
+                  ? (selectedStartTime ?? TimeOfDay.now())
+                  : (selectedEndTime ?? TimeOfDay.now()),
+            );
+            if (pickedTime != null) {
+              if (isStartTime) {
+                selectedStartTime = pickedTime;
+                jamMulaiController.text = pickedTime.format(context);
+              } else {
+                selectedEndTime = pickedTime;
+                jamBerakhirController.text = pickedTime.format(context);
+              }
+              setState(() {});
+            }
+          }
+
           return Dialog(
             backgroundColor: Colors.white,
             insetPadding: const EdgeInsets.symmetric(
@@ -243,11 +272,7 @@ Future<void> showEditPerusahaanPopup(
                                 border: OutlineInputBorder(),
                               ),
                               onTap: () async {
-                                await pickTime(context, true);
-                                setState(() {
-                                  jamMulaiController.text =
-                                      selectedStartTime!.format(context);
-                                });
+                                await pickTime(true);
                               },
                             ),
                           ),
@@ -265,11 +290,7 @@ Future<void> showEditPerusahaanPopup(
                                 border: OutlineInputBorder(),
                               ),
                               onTap: () async {
-                                await pickTime(context, false);
-                                setState(() {
-                                  jamBerakhirController.text =
-                                      selectedStartTime!.format(context);
-                                });
+                                await pickTime(false);
                               },
                             ),
                           ),
@@ -312,7 +333,7 @@ Future<void> showEditPerusahaanPopup(
                         Align(
                             alignment: Alignment.centerLeft,
                             child: Image.network(
-                              '${BaseApi.base}/storage/public/corporations-images/$fileName',
+                              '${BaseApi.corporateImageUrl}/$fileName',
                               height: 40,
                               width: 40,
                               errorBuilder: (context, error, stackTrace) =>

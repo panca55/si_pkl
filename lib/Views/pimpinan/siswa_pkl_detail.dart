@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/models/pimpinan/siswa_index_model.dart';
 import 'package:si_pkl/provider/pimpinan/siswa_provider.dart';
 import 'package:si_pkl/themes/global_color_theme.dart';
@@ -82,7 +83,8 @@ class _SiswaPklDetailState extends State<SiswaPklDetail> {
                 children: [
                   _buildInfoCard(
                     image:
-                        'http://localhost:8000/storage/public/teachers-images/indah_1732989878.png',
+                        '${BaseApi.studentImageUrl}/${siswa.student
+                        ?.foto}',
                     colorHeader: GlobalColorTheme.primaryBlueColor,
                     title: siswa.student?.nama ?? '-',
                     property1: 'Email',

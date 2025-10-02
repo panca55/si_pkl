@@ -341,7 +341,7 @@ Future<void> showEditTeacherPopup(
                         Align(
                             alignment: Alignment.centerLeft,
                             child: Image.network(
-                              '${BaseApi.base}/storage/public/students-images/$fileName',
+                              '${BaseApi.teacherImageUrl}/$fileName',
                               height: 40,
                               width: 40,
                               errorBuilder: (context, error, stackTrace) =>

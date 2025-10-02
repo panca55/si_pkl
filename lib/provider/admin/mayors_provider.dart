@@ -43,6 +43,7 @@ class MayorsProvider extends BaseApi with ChangeNotifier {
       debugPrint('Error menghapus data user:: $e');
     }
   }
+
   Future<void> getMayors() async {
     final tokenUser = authController.authToken;
 
@@ -59,6 +60,8 @@ class MayorsProvider extends BaseApi with ChangeNotifier {
         debugPrint('Berhasil mendapatkan data: ${response.statusCode}');
         final responseData = json.decode(response.body);
         _mayorsModel = MayorsModel.fromJson(responseData);
+        _mayors.clear();
+        _mayors.addAll(_mayorsModel?.mayor ?? []);
         notifyListeners();
         debugPrint('Data berhasil di-parse: $_mayorsModel');
         debugPrint('respon data: $responseData');
@@ -93,6 +96,8 @@ class MayorsProvider extends BaseApi with ChangeNotifier {
         debugPrint('Berhasil submit logbook');
         final responseData = json.decode(responseBody);
         _mayorsModel = MayorsModel.fromJson(responseData);
+        _mayors.clear();
+        _mayors.addAll(_mayorsModel?.mayor ?? []);
         notifyListeners();
       } else {
         debugPrint('Gagal submit komentar: ${response.statusCode}');
@@ -102,7 +107,7 @@ class MayorsProvider extends BaseApi with ChangeNotifier {
       debugPrint('Error submitKomentar: $e');
     }
   }
-  
+
   Future<void> editKelas({
     required int id,
     required Map<String, dynamic> data,
@@ -133,6 +138,8 @@ class MayorsProvider extends BaseApi with ChangeNotifier {
         debugPrint('Berhasil edit data siswa');
         debugPrint('Data sebelum dikirim: ${jsonEncode(data)}');
         _mayorsModel = MayorsModel.fromJson(responseData);
+        _mayors.clear();
+        _mayors.addAll(_mayorsModel?.mayor ?? []);
         notifyListeners();
       } else {
         debugPrint('Gagal edit data siswa: ${response.statusCode}');

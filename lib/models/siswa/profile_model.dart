@@ -44,9 +44,13 @@ class ProfileModel {
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
-      id: json['id'],
-      userId: json['user_id'],
-      mayorId: json['mayor_id'],
+      id: json['id'] != null ? int.parse(json['id'].toString()) : null,
+      userId: json['user_id'] != null
+          ? int.parse(json['user_id'].toString())
+          : null,
+      mayorId: json['mayor_id'] != null
+          ? int.parse(json['mayor_id'].toString())
+          : null,
       nisn: json['nisn'],
       nama: json['nama'],
       konsentrasi: json['konsentrasi'],
@@ -63,11 +67,14 @@ class ProfileModel {
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       mayor: json['mayor'] != null ? Mayor.fromJson(json['mayor']) : null,
-      internship: json['internship'] != null ? Internship.fromJson(json['internship']) : null,
+      internship: json['internship'] != null
+          ? Internship.fromJson(json['internship'])
+          : null,
     );
   }
 }
-class Internship{
+
+class Internship {
   int? id;
   int? studentId;
   int? teacherId;
@@ -82,20 +89,21 @@ class Internship{
   Teacher? teacher;
   Instructor? instructor;
   Corporation? corporation;
-  Internship({this.id,
-    this.studentId,
-    this.teacherId,
-    this.corporationId,
-    this.instructorId,
-    this.tahunAjaran,
-    this.tanggalMulai,
-    this.tanggalBerakhir,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-    this.teacher,
-    this.instructor,
-    this.corporation});
+  Internship(
+      {this.id,
+      this.studentId,
+      this.teacherId,
+      this.corporationId,
+      this.instructorId,
+      this.tahunAjaran,
+      this.tanggalMulai,
+      this.tanggalBerakhir,
+      this.status,
+      this.createdAt,
+      this.updatedAt,
+      this.teacher,
+      this.instructor,
+      this.corporation});
   factory Internship.fromJson(Map<String, dynamic> json) {
     return Internship(
       id: json['id'],
@@ -109,13 +117,17 @@ class Internship{
       status: json['status'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
-      teacher: json['teacher'] != null ? Teacher.fromJson(json['teacher']) : null,
-      instructor: json['instructor'] != null ? Instructor.fromJson(json['instructor']) : null,
-      corporation: json['corporation'] != null ? Corporation.fromJson(json['corporation']) : null,
+      teacher:
+          json['teacher'] != null ? Teacher.fromJson(json['teacher']) : null,
+      instructor: json['instructor'] != null
+          ? Instructor.fromJson(json['instructor'])
+          : null,
+      corporation: json['corporation'] != null
+          ? Corporation.fromJson(json['corporation'])
+          : null,
     );
   }
 }
-
 
 class Mayor {
   int? id;
@@ -124,25 +136,26 @@ class Mayor {
   String? createdAt;
   String? updatedAt;
 
-  Mayor(
-      {this.id,
-      this.departmentId,
-      this.nama,
-      this.createdAt,
-      this.updatedAt,
-      });
+  Mayor({
+    this.id,
+    this.departmentId,
+    this.nama,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   factory Mayor.fromJson(Map<String, dynamic> json) {
     return Mayor(
-      id: json['id'],
-      departmentId: json['department_id'],
+      id: json['id'] != null ? int.parse(json['id'].toString()) : null,
+      departmentId: json['department_id'] != null
+          ? int.parse(json['department_id'].toString())
+          : null,
       nama: json['nama'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
     );
   }
 }
-
 
 class Corporation {
   Corporation({
@@ -236,7 +249,6 @@ class Corporation {
       };
 }
 
-
 class Teacher {
   Teacher({
     this.id,
@@ -312,6 +324,7 @@ class Teacher {
         "updated_at": updatedAt?.toIso8601String(),
       };
 }
+
 class Instructor {
   Instructor({
     this.id,

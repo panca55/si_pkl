@@ -59,12 +59,15 @@ class Corporations {
 
   factory Corporations.fromJson(Map<String, dynamic> json) {
     return Corporations(
-      id: json['id'],
-      userId: json['user_id'],
+      id: json['id'] != null ? int.tryParse(json['id'].toString()) : null,
+      userId: json['user_id'] != null
+          ? int.tryParse(json['user_id'].toString())
+          : null,
       nama: json['nama'],
       slug: json['slug'],
       alamat: json['alamat'],
-      quota: json['quota'],
+      quota:
+          json['quota'] != null ? int.tryParse(json['quota'].toString()) : null,
       mulaiHariKerja: json['mulai_hari_kerja'],
       akhirHariKerja: json['akhir_hari_kerja'],
       jamMulai: json['jam_mulai'],
@@ -83,6 +86,7 @@ class Corporations {
     );
   }
 }
+
 class User {
   int? id;
   String? name;

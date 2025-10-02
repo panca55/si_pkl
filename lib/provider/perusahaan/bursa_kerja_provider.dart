@@ -100,13 +100,17 @@ class BursaKerjaProvider extends BaseApi with ChangeNotifier {
     }
 
     try {
+      // Remove 'id' from data as it should not be in request body for Laravel updates
+      Map<String, dynamic> requestData = Map.from(data);
+      requestData.remove('id');
+
       if (fileBytes != null && fileName != null) {
         // Use MultipartRequest for file upload
         var request = http.MultipartRequest(
             'POST', Uri.parse('http://127.0.0.1:8000/api/bursa/$id'));
         request.headers.addAll(super.getHeaders(tokenUser));
-        request.fields
-            .addAll(data.map((key, value) => MapEntry(key, value.toString())));
+        request.fields.addAll(
+            requestData.map((key, value) => MapEntry(key, value.toString())));
         request.fields['_method'] = 'PUT'; // For Laravel PUT via POST
         request.files.add(http.MultipartFile.fromBytes('foto', fileBytes,
             filename: fileName));
@@ -125,7 +129,7 @@ class BursaKerjaProvider extends BaseApi with ChangeNotifier {
         http.Response response = await http.put(
           Uri.parse('http://127.0.0.1:8000/api/bursa/$id'),
           headers: super.getHeaders(tokenUser),
-          body: json.encode(data),
+          body: json.encode(requestData),
         );
         if (response.statusCode == 200) {
           debugPrint('Berhasil edit data: ${response.statusCode}');

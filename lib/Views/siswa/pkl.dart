@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:si_pkl/Views/pimpinan/siswa_pkl_detail.dart';
+import 'package:si_pkl/Views/siswa/attendance_detail_page.dart';
 import 'package:si_pkl/Views/siswa/widgets/show_edit_logbook_form.dart';
 import 'package:si_pkl/provider/siswa/intern_provider.dart';
 import 'package:si_pkl/Views/siswa/widgets/show_logbook_form.dart';
@@ -680,14 +681,13 @@ class _PklState extends State<Pkl> with RouteAware {
               onTap: () async {
                 final siswaId = internProvider.currentIntern?.internship
                     ?.studentId; // Ambil ID siswa dari objek siswa
-                debugPrint('ID yang dipilih: $siswaId');
+                debugPrint('ID: $siswaId');
 
                 // Navigasikan ke halaman SiswaPklDetail dengan menggunakan ID
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (BuildContext context) => SiswaPklDetail(
-                      siswaId: siswaId,
+                    builder: (BuildContext context) => AttendanceDetailPage(
                     ),
                   ),
                 );

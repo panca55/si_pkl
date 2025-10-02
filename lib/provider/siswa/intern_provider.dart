@@ -13,6 +13,8 @@ class InternProvider extends BaseApi with ChangeNotifier {
   List<InternshipModel> get intern => _intern;
   InternshipModel? _currentIntern;
   InternshipModel? get currentIntern => _currentIntern;
+  AttendanceDetailModel? _attendanceResponse;
+  AttendanceDetailModel? get attendanceResponse => _attendanceResponse;
   final AuthController authController;
 
   InternProvider({required this.authController});
@@ -113,7 +115,7 @@ class InternProvider extends BaseApi with ChangeNotifier {
     try {
       final uri = super.logbookPostPath;
       final request = http.MultipartRequest('POST', uri)
-        ..headers.addAll(super.getHeaders(tokenUser))
+        ..headers.addAll(super.getMultipartHeaders(tokenUser))
         ..fields.addAll({
           'judul': judul,
           'category': category,
@@ -199,7 +201,7 @@ class InternProvider extends BaseApi with ChangeNotifier {
       debugPrint(
           'Edit logbook data: judul=$judul, category=$category, isi=$isi, keterangan=$keterangan');
       final request = http.MultipartRequest('POST', uri)
-        ..headers.addAll(super.getHeaders(tokenUser))
+        ..headers.addAll(super.getMultipartHeaders(tokenUser))
         ..fields.addAll({
           'judul': judul,
           'category': category,
@@ -287,8 +289,7 @@ class InternProvider extends BaseApi with ChangeNotifier {
         headers: super.getHeaders(tokenUser),
       );
       if (response.statusCode == 200) {
-        _currentIntern?.logbook
-            ?.removeWhere((logbook) => logbook.id == id);
+        _currentIntern?.logbook?.removeWhere((logbook) => logbook.id == id);
         notifyListeners();
         debugPrint('Berhasil menghapus logbook');
       } else {
@@ -298,6 +299,7 @@ class InternProvider extends BaseApi with ChangeNotifier {
       debugPrint('Error deleteLogbook: $e');
     }
   }
+
   // Periksa apakah hari ini dalam masa PKL
   bool isMasaPkl({
     required String tanggalMulai,
@@ -378,5 +380,37 @@ class InternProvider extends BaseApi with ChangeNotifier {
           tanggalMulai: intern!.internship!.tanggalMulai!,
           tanggalBerakhir: intern.internship!.tanggalBerakhir!,
         );
+  }
+
+  // Mendapatkan detail absensi siswa
+  Future<void> getAttendanceDetail({String? filter}) async {
+    final tokenUser = authController.authToken;
+    try {
+      Uri url = super.attendanceDetailPath;
+      if (filter != null && filter != 'semua') {
+        url = Uri.parse('${super.attendanceDetailPath}?filter=$filter');
+      }
+      http.Response response = await http.get(
+        url,
+        headers: super.getHeaders(tokenUser),
+      );
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        _attendanceResponse = AttendanceDetailModel.fromJson(responseData);
+        notifyListeners();
+        debugPrint('Berhasil mendapatkan detail absensi');
+        debugPrint('Data lengkap: ${response.body}');
+        debugPrint(
+            'Parsed attendances: ${_attendanceResponse?.attendances?.length} items');
+        _attendanceResponse?.attendances?.forEach((att) {
+          debugPrint(
+              'Attendance: ${att.tanggal} - ${att.keterangan} - photo: ${att.photo} - deskripsi: ${att.deskripsi}');
+        });
+      } else {
+        debugPrint('Gagal mendapatkan detail absensi: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error getAttendanceDetail: $e');
+    }
   }
 }

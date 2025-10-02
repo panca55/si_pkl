@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:si_pkl/Services/base_api.dart';
 import 'package:si_pkl/Views/instruktur/widgets/show_komentar_edit_popup.dart';
 import 'package:si_pkl/Views/instruktur/widgets/show_komentar_popup.dart';
 import 'package:si_pkl/provider/instruktur/detail_logbook_instruktur_provider.dart';
@@ -116,7 +117,7 @@ class _DetailLogbookState extends State<DetailLogbook> {
                         logbook: logbook,
                         logbookId: logbookData?.id,
                         image:
-                            'http://localhost:8000/storage/public/students-images/${logbookDataDetail?.fotoKegiatan}',
+                            '${BaseApi.studentImageUrl}/${logbookDataDetail?.fotoKegiatan}',
                         colorHeader: GlobalColorTheme.primaryBlueColor,
                         title: 'Detail Logbook',
                         property1: 'Judul Pekerjaan :',
